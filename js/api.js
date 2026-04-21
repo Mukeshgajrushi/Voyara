@@ -1,5 +1,7 @@
-// Base URL for backend API
-const API_URL = 'http://localhost:5000/api';
+// Base URL for backend API - Update the URL below with your actual deployed backend URL
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:5000/api'
+  : 'https://voyara-backend.vercel.app/'; 
 
 // Helper to handle tokens and common fetch logic
 window.fetchAPI = async function(endpoint, options = {}) {
