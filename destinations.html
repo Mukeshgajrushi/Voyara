@@ -66,8 +66,35 @@
   </div>
 </div>
 
-<div class="container">
-<!-- destinations.js handles dynamic loading -->
+<div class="container section-sm">
+  <div class="dest-grid" id="dGrid">
+    <!-- Loaded dynamically via destinations.js -->
+  </div>
+</div>
+
+<!-- Destination Detail Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="mTitle"></h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="mBody"></div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><div class="footer-brand">Voy<span>ara</span></div><p class="footer-desc">Crafting unforgettable journeys since 2010.</p></div>
+      <div class="footer-col"><h5>Explore</h5><ul><li><a href="destinations.html">Destinations</a></li><li><a href="packages.html">Packages</a></li></ul></div>
+      <div class="footer-col"><h5>Company</h5><ul><li><a href="about.html">About Us</a></li><li><a href="#">Careers</a></li></ul></div>
+      <div class="footer-col"><h5>Support</h5><ul><li><a href="help-center.html">Help Centre</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2025 Voyara Travel</span><span>Privacy · Terms</span></div>
+  </div>
+</footer>
+
 <script src="js/destinations.js"></script>
 </body>
 </html>
