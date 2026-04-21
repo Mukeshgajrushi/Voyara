@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Book Your Trip — Voyara</title>
+<link rel="stylesheet" href="style.css">
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/booking.js"></script>
+<style>
+.booking-layout{display:grid;grid-template-columns:1fr 360px;gap:32px;padding:48px 0;align-items:start}
+.steps{display:flex;align-items:center;margin-bottom:36px}
+.step{display:flex;align-items:center;gap:10px}
+.step-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;border:1.5px solid var(--border);color:var(--ts);background:var(--white)}
+.step.active .step-num,.step.done .step-num{background:var(--ac);color:#fff;border-color:var(--ac)}
+.step-label{font-size:14px;font-weight:500;color:var(--ts)}.step.active .step-label{color:var(--text)}
+.step-line{flex:1;height:1px;background:var(--border);margin:0 12px}
+.bsec{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:26px;margin-bottom:20px}
+.bsec h3{font-size:1.1rem;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.guest-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.guest-row:last-child{border-bottom:none}
+.glabel{font-size:14px;font-weight:500;color:var(--text)}.gsub{font-size:12px;color:var(--ts);margin-top:2px}
+.counter{display:flex;align-items:center;gap:12px}
+.cbtn{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--text)}
+.cbtn:hover{border-color:var(--ac);color:var(--ac)}
+.cval{font-size:15px;font-weight:600;min-width:20px;text-align:center;color:var(--text)}
+.ropt{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid var(--border);border-radius:var(--rs);cursor:pointer;transition:border-color .15s;margin-bottom:10px}
+.ropt:last-child{margin-bottom:0}.ropt:hover{border-color:var(--muted)}.ropt.sel{border-color:var(--ac);background:var(--acl)}
+.ropt input{accent-color:var(--ac);width:16px;height:16px}
+.ropt-title{font-size:14px;font-weight:500;color:var(--text)}.ropt-sub{font-size:12px;color:var(--ts);margin-top:2px}
+.card-f{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.pay-extra{display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.sum-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;position:sticky;top:calc(var(--nh)+20px)}
+.sum-img{aspect-ratio:16/8;background:var(--light);overflow:hidden}
+.sum-img img{width:100%;height:100%;object-fit:cover}
+.sum-body{padding:20px}
+.sum-title{font-family:var(--fd);font-size:1.1rem;color:var(--text);margin-bottom:4px}
+.sum-meta{font-size:13px;color:var(--ts);margin-bottom:14px}
+.p-row{display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px}
+.p-row span:last-child{color:var(--text);font-weight:500}
+.p-total{font-weight:600;font-size:15px;color:var(--text);padding-top:12px;border-top:1px solid var(--border);margin-top:4px}
+.confirm{display:none;text-align:center;padding:40px 20px}
+.confirm.show{display:block}
+.c-icon{width:64px;height:64px;border-radius:50%;background:var(--acl);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
+@media(max-width:900px){.booking-layout{grid-template-columns:1fr}}
+@media(max-width:600px){.form-row,.card-f{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="navbar"><div class="container">
+  <a href="index.html" class="navbar-brand">Voy<span>ara</span></a>
+  <nav class="navbar-nav"><a href="destinations.html">Destinations</a><a href="packages.html">Packages</a><a href="search.html">Search</a><a href="about.html">About</a></nav>
+  <div class="navbar-actions"><a href="my-trips.html" class="btn btn-ghost btn-sm">My Trips</a><a href="login.html" class="btn btn-outline btn-sm">Log in</a></div>
+</div></nav>
+
+<div class="page-header"><div class="container">
+  <div class="breadcrumb"><a href="#">Home</a><span>›</span><a href="packages.html">Packages</a><span>›</span><span>Book Now</span></div>
+  <h1 style="margin-top:12px">Complete your booking</h1>
+</div></div>
+
+<div class="container"><div class="booking-layout">
+  <div>
+    <div class="steps">
+      <div class="step active" id="s1"><div class="step-num">1</div><div class="step-label">Trip Details</div></div>
+      <div class="step-line"></div>
+      <div class="step" id="s2"><div class="step-num">2</div><div class="step-label">Traveller Info</div></div>
+      <div class="step-line"></div>
+      <div class="step" id="s3"><div class="step-num">3</div><div class="step-label">Payment</div></div>
+    </div>
+
+    <div id="step1">
+      <div class="bsec"><h3>Select your dates</h3>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Check-in</label><input type="date" class="form-control" id="cin"></div>
+          <div class="form-group"><label class="form-label">Check-out</label><input type="date" class="form-control" id="cout"></div>
+        </div>
+      </div>
+      <div class="bsec"><h3>Guests</h3>
+        <div class="guest-row"><div><div class="glabel">Adults</div><div class="gsub">Age 13+</div></div><div class="counter"><button class="cbtn" onclick="upd('adults',-1)">−</button><span class="cval" id="adults">2</span><button class="cbtn" onclick="upd('adults',1)">+</button></div></div>
+        <div class="guest-row"><div><div class="glabel">Children</div><div class="gsub">Ages 2–12</div></div><div class="counter"><button class="cbtn" onclick="upd('children',-1)">−</button><span class="cval" id="children">0</span><button class="cbtn" onclick="upd('children',1)">+</button></div></div>
+        <div class="guest-row"><div><div class="glabel">Infants</div><div class="gsub">Under 2</div></div><div class="counter"><button class="cbtn" onclick="upd('infants',-1)">−</button><span class="cval" id="infants">0</span><button class="cbtn" onclick="upd('infants',1)">+</button></div></div>
+      </div>
+      <div class="bsec"><h3>Room preference</h3>
+        <div class="ropt sel" onclick="selOpt(this)"><input type="radio" name="room" checked><div><div class="ropt-title">Standard Room</div><div class="ropt-sub">Comfortable double bed, essential amenities</div></div><strong>+₹0</strong></div>
+        <div class="ropt" onclick="selOpt(this)"><input type="radio" name="room"><div><div class="ropt-title">Deluxe Room</div><div class="ropt-sub">Larger room with premium view</div></div><strong>+₹3,000</strong></div>
+        <div class="ropt" onclick="selOpt(this)"><input type="radio" name="room"><div><div class="ropt-title">Suite / Villa</div><div class="ropt-sub">Premium private experience</div></div><strong>+₹8,000</strong></div>
+      </div>
+      <button class="btn btn-primary btn-lg" onclick="go(2)">Continue to Traveller Info →</button>
+    </div>
+
+    <div id="step2" style="display:none">
+      <div class="bsec"><h3>Primary traveller</h3>
+        <div class="form-row"><div class="form-group"><label class="form-label">First Name</label><input class="form-control" id="t-fname" placeholder="Rahul"></div><div class="form-group"><label class="form-label">Last Name</label><input class="form-control" id="t-lname" placeholder="Sharma"></div></div>
+        <div class="form-row" style="margin-top:16px"><div class="form-group"><label class="form-label">Email</label><input type="email" id="t-email" class="form-control" placeholder="rahul@email.com"></div><div class="form-group"><label class="form-label">Phone</label><input type="tel" id="t-phone" class="form-control" placeholder="+91 98765 43210"></div></div>
+        <div class="form-row" style="margin-top:16px"><div class="form-group"><label class="form-label">Date of Birth</label><input type="date" class="form-control"></div><div class="form-group"><label class="form-label">Passport Number</label><input class="form-control" placeholder="A1234567"></div></div>
+        <div class="form-group" style="margin-top:16px"><label class="form-label">Special Requests</label><textarea class="form-control" id="t-req" placeholder="Dietary needs, anniversary surprises, accessibility..."></textarea></div>
+      </div>
+      <div class="bsec"><h3>Emergency contact</h3>
+        <div class="form-row"><div class="form-group"><label class="form-label">Name</label><input class="form-control" placeholder="Priya Sharma"></div><div class="form-group"><label class="form-label">Relationship</label><select class="form-control"><option>Spouse</option><option>Parent</option><option>Sibling</option><option>Friend</option></select></div></div>
+        <div class="form-group" style="margin-top:16px"><label class="form-label">Phone</label><input type="tel" class="form-control" placeholder="+91 98765 43210"></div>
+      </div>
+      <div style="display:flex;gap:12px"><button class="btn btn-outline" onclick="go(1)">← Back</button><button class="btn btn-primary btn-lg" onclick="go(3)">Continue to Payment →</button></div>
+    </div>
+
+    <div id="step3" style="display:none">
+      <div class="bsec"><h3>Payment method</h3>
+        <div class="ropt sel" onclick="payMethod('card',this)"><input type="radio" name="pay" checked><div><div class="ropt-title">Credit / Debit Card</div><div class="ropt-sub">Visa, Mastercard, RuPay</div></div><span>💳</span></div>
+        <div class="ropt" onclick="payMethod('upi',this)"><input type="radio" name="pay"><div><div class="ropt-title">UPI</div><div class="ropt-sub">GPay, PhonePe, Paytm</div></div><span>📱</span></div>
+        <div class="ropt" onclick="payMethod('net',this)"><input type="radio" name="pay"><div><div class="ropt-title">Net Banking</div><div class="ropt-sub">All major Indian banks</div></div><span>🏦</span></div>
+        <div class="ropt" onclick="payMethod('emi',this)"><input type="radio" name="pay"><div><div class="ropt-title">EMI</div><div class="ropt-sub">0% interest on 3 & 6 month plans</div></div><span>📅</span></div>
+        <div class="card-f" id="cardF">
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">Card Number</label><input class="form-control" placeholder="1234  5678  9012  3456"></div>
+          <div class="form-group"><label class="form-label">Expiry (MM/YY)</label><input class="form-control" placeholder="08 / 27"></div>
+          <div class="form-group"><label class="form-label">CVV</label><input type="password" class="form-control" placeholder="•••" maxlength="4"></div>
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">Name on Card</label><input class="form-control" placeholder="Rahul Sharma"></div>
+        </div>
+        <div class="pay-extra" id="upiF"><div class="form-group"><label class="form-label">UPI ID</label><input class="form-control" placeholder="name@upi"></div></div>
+        <div class="pay-extra" id="netF"><div class="form-group"><label class="form-label">Select Bank</label><select class="form-control"><option>SBI</option><option>HDFC Bank</option><option>ICICI Bank</option><option>Axis Bank</option></select></div></div>
+        <div class="pay-extra" id="emiF"><div class="form-group"><label class="form-label">EMI Plan</label><select class="form-control"><option>3 months — ₹28,999/month (0% interest)</option><option>6 months — ₹14,499/month (0% interest)</option><option>12 months — ₹7,800/month (12% p.a.)</option></select></div></div>
+      </div>
+      <div class="bsec"><h3>Coupon code</h3>
+        <div style="display:flex;gap:10px"><input class="form-control" placeholder="e.g. VOYARA10" id="coup"><button class="btn btn-outline" onclick="applyCoup()">Apply</button></div>
+        <div id="coupMsg" style="margin-top:10px;display:none"></div>
+      </div>
+      <div style="display:flex;gap:12px"><button class="btn btn-outline" onclick="go(2)">← Back</button><button class="btn btn-primary btn-lg" id="confirm-btn" onclick="handleConfirmBooking()">Confirm & Pay →</button></div>
+    </div>
+
+    <div class="confirm" id="confirmed">
+      <div class="c-icon">✓</div>
+      <h2 style="margin-bottom:10px">Booking Confirmed!</h2>
+      <p style="font-size:16px;margin-bottom:8px">Booking ID: <strong style="color:var(--text)" id="booking-id-text">VYR-XXX</strong></p>
+      <p style="margin-bottom:28px">A confirmation email has been sent to your address.</p>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <a href="my-trips.html" class="btn btn-primary btn-lg">View My Trips</a>
+        <a href="packages.html" class="btn btn-outline btn-lg">Browse More</a>
+      </div>
+    </div>
+  </div>
+
+  <div><div class="sum-card">
+    <div class="sum-img"><img src="https://images.unsplash.com/photo-1559628233-100c798642d4?w=500&q=80" id="sum-img" alt="Package"></div>
+    <div class="sum-body">
+      <div class="sum-title" id="sum-title">Custom Package</div>
+      <div class="sum-meta" id="sum-meta">5 Days / 4 Nights · <span id="gc">2 Adults</span></div>
+      <div class="divider" style="margin:14px 0"></div>
+      <div class="p-row"><span id="p-base-label">Base price</span><span id="p-base">---</span></div>
+      <div class="p-row"><span>Taxes & fees (18% GST)</span><span id="p-taxes">---</span></div>
+      <div class="p-row" id="discRow" style="display:none;color:var(--ac)"><span>Coupon discount</span><span id="discAmt">−₹0</span></div>
+      <div class="p-row p-total"><span>Total</span><span id="tot">---</span></div>
+      <div class="divider" style="margin:14px 0"></div>
+      <a href="budget-calculator.html" id="budgetLink" target="_blank" class="btn btn-outline" style="width:100%;margin-bottom:14px;border-color:var(--black);color:var(--black);">📊 Open Custom Budget Tracker</a>
+      <div class="alert alert-success" style="font-size:13px">Free cancellation up to 48 hrs before departure</div>
+    </div>
+  </div></div>
+</div></div>
+
+<footer class="footer"><div class="container">
+  <div class="footer-grid">
+    <div><div class="footer-brand">Voy<span>ara</span></div><p class="footer-desc">Crafting unforgettable journeys since 2010.</p></div>
+    <div class="footer-col"><h5>Explore</h5><ul><li><a href="destinations.html">Destinations</a></li><li><a href="packages.html">Packages</a></li></ul></div>
+    <div class="footer-col"><h5>Company</h5><ul><li><a href="about.html">About Us</a></li></ul></div>
+    <div class="footer-col"><h5>Support</h5><ul><li><a href="help-center.html">Help Centre</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><span>© 2025 Voyara Travel</span><span>Privacy · Terms</span></div>
+</div></footer>
+
+<script>
+function go(n){[1,2,3].forEach(i=>{document.getElementById('step'+i).style.display=i===n?'block':'none';const s=document.getElementById('s'+i);s.classList.toggle('active',i===n);s.classList.toggle('done',i<n)});document.getElementById('confirmed').classList.remove('show');window.scrollTo({top:0,behavior:'smooth'})}
+function selOpt(el){el.closest('.bsec').querySelectorAll('.ropt').forEach(r=>r.classList.remove('sel'));el.classList.add('sel')}
+function payMethod(m,el){el.closest('.bsec').querySelectorAll('.ropt').forEach(r=>r.classList.remove('sel'));el.classList.add('sel');document.getElementById('cardF').style.display=m==='card'?'grid':'none';['upiF','netF','emiF'].forEach(id=>document.getElementById(id).style.display='none');if(m!=='card'){const map={upi:'upiF',net:'netF',emi:'emiF'};document.getElementById(map[m]).style.display='block'}}
+function applyCoup(){const v=document.getElementById('coup').value.trim().toUpperCase(),msg=document.getElementById('coupMsg');if(v==='VOYARA10'){msg.innerHTML='<div class="alert alert-success">₹8,500 discount applied!</div>';document.getElementById('discRow').style.display='flex';document.getElementById('discAmt').textContent='−₹8,500';}else{msg.innerHTML='<div class="alert alert-danger">Invalid coupon code</div>';document.getElementById('discRow').style.display='none';}msg.style.display='block'}
+const t=new Date(),n=new Date();n.setDate(t.getDate()+14);
+document.getElementById('cin').value=t.toISOString().split('T')[0];
+document.getElementById('cout').value=n.toISOString().split('T')[0];
+</script>
+</body></html>

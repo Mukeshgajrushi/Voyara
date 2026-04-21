@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Packages — Voyara</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="packages_page.css">
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+
+</head>
+<body>
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="navbar-brand">Voy<span>ara</span></a>
+    <nav class="navbar-nav">
+      <a href="destinations.html">Destinations</a>
+      <a href="packages.html" class="active">Packages</a>
+      <a href="search.html">Search</a>
+      <a href="blog.html">Blog</a>
+      <a href="about.html">About</a>
+    </nav>
+    <div class="navbar-actions">
+      <a href="my-trips.html" class="btn btn-ghost btn-sm">My Trips</a>
+      <a href="login.html" class="btn btn-outline btn-sm">Log in</a>
+    </div>
+  </div>
+</nav>
+
+<section class="pkg-hero">
+  <div class="container">
+    <div class="section-label">Curated packages</div>
+    <h1>All-inclusive travel packages</h1>
+    <p class="lead">Everything sorted — flights, hotels, activities, and transfers. Just pack your bags.</p>
+  </div>
+</section>
+
+<!-- Filters -->
+<div class="filter-wrapper">
+  <div class="container">
+    <div class="filter-bar">
+      <span class="tag active" onclick="filterPkg('all',this)">All Packages</span>
+      <span class="tag" onclick="filterPkg('national',this)">National</span>
+      <span class="tag" onclick="filterPkg('international',this)">International</span>
+      <span class="tag" onclick="filterPkg('honeymoon',this)">Honeymoon</span>
+      <span class="tag" onclick="filterPkg('family',this)">Family</span>
+      <span class="tag" onclick="filterPkg('adventure',this)">Adventure</span>
+      <span class="tag" onclick="filterPkg('budget',this)">Budget</span>
+      <span class="tag" onclick="filterPkg('luxury',this)">Luxury</span>
+      
+      <div class="filter-controls">
+        <select id="pkgDuration" class="filter-select" onchange="applyPkgFilters()">
+          <option value="any">Duration: Any</option>
+          <option value="3-5">3–5 Days</option>
+          <option value="5-7">5–7 Days</option>
+          <option value="7plus">7+ Days</option>
+        </select>
+        <select id="pkgBudget" class="filter-select" onchange="applyPkgFilters()">
+          <option value="any">Budget: Any</option>
+          <option value="under20">Under ₹20,000</option>
+          <option value="20-60">₹20k–₹60k</option>
+          <option value="over60">₹60k+</option>
+        </select>
+        <select id="pkgSort" class="filter-select" onchange="applyPkgFilters()">
+          <option value="recommended">Sort: Recommended</option>
+          <option value="price-asc">Price: Low → High</option>
+          <option value="price-desc">Price: High → Low</option>
+          <option value="rating">Highest Rated</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container section-sm">
+  <div class="pkg-grid" id="pkgGrid">
+    <!-- Loaded dynamically via packages.js -->
+  </div>
+</div>
+
+<!-- Package Detail Modal -->
+<div class="modal-overlay" id="pkgModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="pmTitle"></h3>
+      <button class="modal-close" onclick="closePkg()">✕</button>
+    </div>
+    <div class="modal-body" id="pmBody"></div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><div class="footer-brand">Voy<span>ara</span></div><p class="footer-desc">Crafting unforgettable journeys since 2010.</p></div>
+      <div class="footer-col"><h5>Explore</h5><ul><li><a href="destinations.html">Destinations</a></li><li><a href="packages.html">Packages</a></li></ul></div>
+      <div class="footer-col"><h5>Company</h5><ul><li><a href="about.html">About Us</a></li><li><a href="#">Careers</a></li></ul></div>
+      <div class="footer-col"><h5>Support</h5><ul><li><a href="help-center.html">Help Centre</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2025 Voyara Travel</span><span>Privacy · Terms</span></div>
+  </div>
+</footer>
+
+<script src="js/packages.js"></script>
+</body>
+</html>

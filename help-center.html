@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Help Centre — Voyara Travel</title>
+<meta name="description" content="Find instant answers to your travel questions. Browse guides on bookings, payments, visas, cancellations, and more at the Voyara Help Centre.">
+<link rel="stylesheet" href="style.css">
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<style>
+/* ── Search Hero ── */
+.hc-hero {
+  background: var(--text);
+  padding: 72px 0 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hc-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1400&q=50') center/cover;
+  opacity: 0.12;
+}
+.hc-hero > * { position: relative; }
+.hc-hero h1 { font-family: var(--fd); font-size: clamp(2rem, 4vw, 3rem); color: #fff; margin-bottom: 12px; }
+.hc-hero p  { color: rgba(255,255,255,0.65); font-size: 16px; margin-bottom: 36px; }
+
+/* Search bar */
+.hc-search {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0;
+  background: var(--white);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+}
+.hc-search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 16px 20px;
+  font-size: 15px;
+  color: var(--text);
+  font-family: var(--fb);
+}
+.hc-search button {
+  background: var(--ac);
+  border: none;
+  padding: 0 26px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--fb);
+  transition: background .15s;
+  white-space: nowrap;
+}
+.hc-search button:hover { background: var(--ach); }
+
+/* Quick stats */
+.hc-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 36px;
+  flex-wrap: wrap;
+}
+.hc-stat { color: rgba(255,255,255,0.6); font-size: 13px; }
+.hc-stat strong { color: #fff; font-size: 20px; font-family: var(--fd); display: block; margin-bottom: 2px; }
+
+/* ── Topic Categories ── */
+.topic-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 48px;
+}
+.topic-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 28px 22px;
+  cursor: pointer;
+  transition: all .18s;
+  position: relative;
+  overflow: hidden;
+}
+.topic-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--ac);
+  transform: scaleX(0);
+  transition: transform .2s;
+}
+.topic-card:hover { box-shadow: var(--sh); transform: translateY(-3px); border-color: var(--ac); }
+.topic-card:hover::after { transform: scaleX(1); }
+.topic-card.active { border-color: var(--ac); background: var(--acl); }
+.topic-card.active::after { transform: scaleX(1); }
+.topic-icon { font-size: 34px; margin-bottom: 14px; }
+.topic-title { font-family: var(--fd); font-size: 1.05rem; margin-bottom: 5px; color: var(--text); }
+.topic-count { font-size: 12px; color: var(--muted); }
+
+/* ── FAQ Panels ── */
+.hc-main { padding: 60px 0; }
+.hc-inner { display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start; }
+.hc-sidebar-nav { 
+  position: sticky;
+  top: calc(64px + 20px);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.hc-nav-title {
+  padding: 16px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  background: var(--off);
+}
+.hc-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ts);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all .15s;
+  border-bottom: 1px solid var(--border);
+}
+.hc-nav-link:last-child { border-bottom: none; }
+.hc-nav-link:hover { color: var(--ac); background: var(--acl); border-left-color: var(--ac); }
+.hc-nav-link.active { color: var(--ac); background: var(--acl); border-left-color: var(--ac); font-weight: 600; }
+.hc-nav-count { margin-left: auto; font-size: 11px; background: var(--light); border-radius: 100px; padding: 2px 8px; color: var(--muted); }
+.hc-nav-link.active .hc-nav-count { background: var(--ac); color: #fff; }
+
+/* ── FAQ section ── */
+.faq-panel { display: none; }
+.faq-panel.active { display: block; }
+.faq-panel-title { font-family: var(--fd); font-size: 1.8rem; margin-bottom: 8px; }
+.faq-panel-sub { font-size: 15px; color: var(--ts); margin-bottom: 32px; }
+.faq-item { border: 1px solid var(--border); border-radius: var(--r); margin-bottom: 10px; overflow: hidden; transition: box-shadow .15s; }
+.faq-item:hover { box-shadow: var(--sh); }
+.faq-q {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 22px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  gap: 16px;
+  user-select: none;
+  background: var(--white);
+  transition: background .15s;
+}
+.faq-q:hover { background: var(--off); }
+.faq-item.open .faq-q { background: var(--acl); color: var(--ac); }
+.faq-chevron { font-size: 18px; transition: transform .25s; flex-shrink: 0; color: var(--muted); }
+.faq-item.open .faq-chevron { transform: rotate(180deg); color: var(--ac); }
+.faq-a {
+  font-size: 14px;
+  color: var(--ts);
+  line-height: 1.85;
+  padding: 0 22px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .35s ease, padding .2s;
+}
+.faq-item.open .faq-a { max-height: 400px; padding: 16px 22px 20px; border-top: 1px solid var(--border); }
+.faq-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.faq-tag { font-size: 11px; padding: 2px 9px; border-radius: 100px; background: var(--light); color: var(--ts); }
+
+/* ── Popular articles ── */
+.popular-section { background: var(--off); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 64px 0; }
+.article-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
+.article-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 24px;
+  transition: box-shadow .2s, transform .2s;
+  cursor: pointer;
+}
+.article-card:hover { box-shadow: var(--sh); transform: translateY(-2px); }
+.article-cat { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--ac); margin-bottom: 8px; }
+.article-title { font-family: var(--fd); font-size: 1.05rem; color: var(--text); margin-bottom: 8px; line-height: 1.35; }
+.article-meta { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.article-helpful { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 12px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ts); }
+.helpful-btn {
+  font-size: 12px;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: none;
+  cursor: pointer;
+  transition: all .15s;
+}
+.helpful-btn:hover { border-color: var(--ac); color: var(--ac); }
+
+/* ── No results ── */
+.no-results { text-align: center; padding: 60px 20px; }
+
+/* ── CTA strip ── */
+.cta-strip {
+  background: var(--text);
+  padding: 64px 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-strip::before { content: ''; position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1400&q=50') center/cover; opacity: .15; }
+.cta-strip > * { position: relative; }
+.cta-strip h2 { font-family: var(--fd); font-size: 2rem; color: #fff; margin-bottom: 10px; }
+.cta-strip p { color: rgba(255,255,255,.65); font-size: 15px; margin-bottom: 28px; }
+.cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-white { background: #fff; color: var(--text); border: none; }
+.btn-white:hover { background: var(--off); }
+.btn-ghost-white { background: rgba(255,255,255,.1); color: #fff; border: 1.5px solid rgba(255,255,255,.3); }
+.btn-ghost-white:hover { background: rgba(255,255,255,.2); }
+
+/* ── Search Highlight ── */
+.highlight { background: #fff3b0; border-radius: 2px; }
+
+/* ── Responsive ── */
+@media (max-width: 1024px) { .topic-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) {
+  .hc-inner { grid-template-columns: 1fr; }
+  .hc-sidebar-nav { position: static; }
+  .article-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) { .topic-grid { grid-template-columns: 1fr 1fr; } .hc-stats { gap: 20px; } }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="navbar-brand">Voy<span>ara</span></a>
+    <nav class="navbar-nav">
+      <a href="destinations.html">Destinations</a>
+      <a href="packages.html">Packages</a>
+      <a href="search.html">Search</a>
+      <a href="blog.html">Blog</a>
+      <a href="about.html">About</a>
+    </nav>
+    <div class="navbar-actions"></div><!-- populated by auth.js -->
+  </div>
+</nav>
+
+<!-- ── HERO SEARCH ── -->
+<div class="hc-hero">
+  <div class="container">
+    <div class="section-label" style="justify-content:center;color:rgba(255,255,255,.5);margin-bottom:14px;">
+      <span style="background:rgba(255,255,255,.1);padding:4px 14px;border-radius:100px;border:1px solid rgba(255,255,255,.15);">Help Centre</span>
+    </div>
+    <h1>How can we help you?</h1>
+    <p>Search our knowledge base or browse topics below</p>
+    <div class="hc-search">
+      <input id="hcSearchInput" type="text" placeholder="e.g. cancellation policy, visa requirements, payment options…" oninput="hcSearch()">
+      <button onclick="hcSearch()">Search</button>
+    </div>
+    <div class="hc-stats">
+      <div class="hc-stat"><strong>200+</strong>Articles</div>
+      <div class="hc-stat"><strong>98%</strong>Issues resolved</div>
+      <div class="hc-stat"><strong>&lt;2 hrs</strong>Response time</div>
+      <div class="hc-stat"><strong>24/7</strong>Live support</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOPIC CATEGORIES ── -->
+<div style="background:var(--off);border-bottom:1px solid var(--border);padding:40px 0 48px;">
+  <div class="container">
+    <div class="topic-grid" id="topicGrid">
+      <!-- injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN FAQ ── -->
+<div class="hc-main">
+  <div class="container">
+    <div class="hc-inner">
+      <!-- Sidebar nav -->
+      <aside>
+        <div class="hc-sidebar-nav" id="hcNav">
+          <div class="hc-nav-title">Browse Topics</div>
+          <!-- injected by JS -->
+        </div>
+      </aside>
+
+      <!-- FAQ panels -->
+      <div id="hcPanels">
+        <!-- Search results panel (hidden by default) -->
+        <div id="searchResultsPanel" style="display:none;">
+          <p class="faq-panel-sub" id="searchResultsCount"></p>
+          <div id="searchResultsList"></div>
+        </div>
+        <!-- Topic panels injected by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── POPULAR ARTICLES ── -->
+<section class="popular-section">
+  <div class="container">
+    <div class="section-label">Most Viewed</div>
+    <h2>Popular articles</h2>
+    <p style="color:var(--ts);margin-top:8px;font-size:15px;">Quick answers to the questions we hear most often.</p>
+    <div class="article-grid" id="articleGrid">
+      <!-- injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ── STILL NEED HELP ── -->
+<div class="cta-strip">
+  <div class="container">
+    <h2>Still need help?</h2>
+    <p>Our travel experts are available 24/7 — no bots, no queues, just real people who love to travel.</p>
+    <div class="cta-btns">
+      <a href="contact.html" class="btn btn-lg btn-white">✉️ Send Us a Message</a>
+      <button class="btn btn-lg btn-ghost-white" onclick="alert('Live Chat opens here in production.')">💬 Start Live Chat</button>
+      <a href="tel:+911800572HELP" class="btn btn-lg btn-ghost-white">📞 Call 1800-572-HELP</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">Voy<span>ara</span></div>
+        <p class="footer-desc">Crafting unforgettable travel experiences since 2018. Your journey, our passion.</p>
+      </div>
+      <div class="footer-col"><h5>Explore</h5><ul><li><a href="destinations.html">Destinations</a></li><li><a href="packages.html">Packages</a></li><li><a href="search.html">Explore</a></li><li><a href="blog.html">Blog</a></li></ul></div>
+      <div class="footer-col"><h5>Company</h5><ul><li><a href="about.html">About Us</a></li><li><a href="#">Careers</a></li><li><a href="#">Press</a></li></ul></div>
+      <div class="footer-col"><h5>Support</h5><ul><li><a href="help-center.html" style="color:var(--ac);font-weight:500;">Help Centre</a></li><li><a href="contact.html">Contact Us</a></li><li><a href="#">Terms</a></li><li><a href="#">Privacy</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Voyara Travel Pvt. Ltd. All rights reserved.</p>
+      <span>IATA Accredited · ATOL Protected</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────
+const TOPICS = [
+  { id: 'bookings',    icon: '🗓️',  title: 'Bookings',           count: 24, desc: 'Making, modifying, or checking your bookings' },
+  { id: 'payments',   icon: '💳',  title: 'Payments & Billing',  count: 18, desc: 'Payment methods, invoices, and receipts' },
+  { id: 'cancel',     icon: '↩️',  title: 'Cancellations',       count: 15, desc: 'Cancellation policies and processing refunds' },
+  { id: 'visa',       icon: '🛂',  title: 'Visas & Documents',   count: 21, desc: 'Visa requirements, documentation, and permits' },
+  { id: 'flights',    icon: '✈️',  title: 'Flights & Transfers', count: 12, desc: 'Flight inclusions, add-ons, and airport transfers' },
+  { id: 'hotels',     icon: '🏨',  title: 'Hotels & Stays',      count: 16, desc: 'Hotel categories, check-in times, and amenities' },
+  { id: 'insurance',  icon: '🛡️',  title: 'Travel Insurance',    count: 10, desc: 'Coverage details, claims, and emergency help' },
+  { id: 'account',    icon: '👤',  title: 'My Account',          count: 9,  desc: 'Profile, password, and preferences' },
+];
+
+const FAQS = {
+  bookings: {
+    title: 'Bookings',
+    sub: '24 articles to help you book, modify or track your trips.',
+    items: [
+      { q: 'How do I make a booking on Voyara?', a: 'Browse packages or destinations, click "Book Now", choose your travel dates and guest count, fill in your details, and complete payment. You\'ll receive an instant confirmation email with your itinerary and booking reference.' },
+      { q: 'Can I book for a group of 10 or more?', a: 'Yes! For groups of 10 or more, contact our dedicated group travel desk at groups@voyara.in or call 1800-572-8899. We offer preferential rates, dedicated coordinators, and custom itineraries.' },
+      { q: 'How do I view or modify an existing booking?', a: 'Login to your account and go to "My Trips". You\'ll see all active bookings with options to view details, download your itinerary, or request a modification. Modifications are subject to availability and the fare difference.' },
+      { q: 'Will I get a confirmation after booking?', a: 'Yes — an email confirmation is sent instantly to your registered email. If you don\'t receive it within 10 minutes, check your spam folder or contact support.' },
+      { q: 'Can I book on behalf of someone else?', a: 'Yes. You can book for family or colleagues. Enter the traveller\'s details (name exactly as on passport) during checkout. Ensure the primary contact email is one you monitor.' },
+    ]
+  },
+  payments: {
+    title: 'Payments & Billing',
+    sub: '18 articles on payment methods, invoices, and billing.',
+    items: [
+      { q: 'What payment methods do you accept?', a: 'We accept Visa, Mastercard, American Express, RuPay, UPI (Google Pay, PhonePe, Paytm), NEFT/RTGS, and EMI via HDFC, ICICI, SBI, and Axis Bank. International bookings can also be paid in USD or EUR via wire transfer.' },
+      { q: 'Is it safe to pay online on Voyara?', a: 'Absolutely. All transactions are secured via 256-bit SSL encryption and processed through PCI-DSS Level 1 compliant gateways. We never store your full card number on our servers.' },
+      { q: 'Can I pay in EMI?', a: 'Yes! EMI is available on bookings above ₹10,000. We partner with HDFC, ICICI, SBI, Axis, and Kotak for 3, 6, 9, and 12-month no-cost EMI options. Select "Pay via EMI" at checkout.' },
+      { q: 'Where can I download my invoice?', a: 'Login → My Trips → select the booking → "Download Invoice". PDF invoices include GST breakdowns and are suitable for corporate expense claims.' },
+      { q: 'Why was my payment declined?', a: 'Common reasons include: insufficient funds, bank security block on international transactions, incorrect CVV/OTP, or card limits. Try a different payment method or call your bank\'s helpline. Contact us if the issue persists.' },
+    ]
+  },
+  cancel: {
+    title: 'Cancellations & Refunds',
+    sub: '15 articles on our cancellation policy and refund process.',
+    items: [
+      { q: 'What is the Voyara cancellation policy?', a: 'Free cancellation up to 30 days before departure. 25% fee for cancellations 15–30 days out. 50% fee for 7–15 days. Under 7 days, 100% may be non-refundable depending on the package. Specific terms are on each package page.' },
+      { q: 'How do I cancel a booking?', a: 'Login → My Trips → select booking → "Cancel Booking". You\'ll see the exact penalty before confirming. Once confirmed, a cancellation reference is emailed to you.' },
+      { q: 'How long does a refund take?', a: 'Refunds to original payment method take 5–7 business days for cards and 2–3 days for UPI/net banking. Bank processing may add 2–3 extra days. You\'ll receive an email once the refund is initiated.' },
+      { q: 'What if the airline or hotel cancels?', a: 'If a supplier cancels your booking, you\'re entitled to a full refund or free rebooking at your choice. We\'ll contact you within 4 hours of being notified and manage all supplier claims on your behalf.' },
+      { q: 'Can I get a refund if I miss my departure?', a: 'Missed departures are generally non-refundable unless covered by your travel insurance policy. We strongly recommend purchasing travel insurance at booking. Contact us immediately — we\'ll do our best to help rebook.' },
+    ]
+  },
+  visa: {
+    title: 'Visas & Documents',
+    sub: '21 articles on visa requirements, applications, and documentation.',
+    items: [
+      { q: 'Does Voyara provide visa assistance?', a: 'Yes! For all our international packages, Voyara provides a complete visa documentation checklist, application form guidance, and appointment scheduling. Our team reviews your application before submission at no extra charge.' },
+      { q: 'Which countries offer visa-on-arrival for Indian passport holders?', a: 'Popular VOA destinations include Thailand, Maldives, Indonesia (Bali), Sri Lanka, Cambodia, Nepal, Bhutan, and Jordan. Requirements and fees change — always check official embassy sources or ask our team.' },
+      { q: 'How early should I apply for a visa?', a: 'We recommend applying 6–8 weeks before departure for most Schengen and US visas, and 4–6 weeks for Southeast Asia. Some destinations (Japan, UK) can take 4–6 weeks due to appointment availability.' },
+      { q: 'What documents are typically required?', a: 'Standard requirements: valid passport (6+ months validity), recent photographs, bank statements (3–6 months), ITR or salary slips, confirmed hotel bookings, travel insurance, and flight itinerary. Specific lists are provided per destination.' },
+      { q: 'Does Voyara guarantee visa approval?', a: 'No travel agent can guarantee visa approval — this is the sole discretion of the respective embassy. However, our team has a 97% first-application success rate through thorough document preparation.' },
+    ]
+  },
+  flights: {
+    title: 'Flights & Transfers',
+    sub: '12 articles on flights included in packages and airport transfers.',
+    items: [
+      { q: 'Are flights included in all packages?', a: 'Not all packages include flights — this is clearly marked on each package page. Packages with "✈️ Flights Included" cover economy class return tickets from the listed departure city (usually Delhi or Mumbai). Upgrades are available.' },
+      { q: 'Can I choose my preferred airline?', a: 'For packages with flights, we book the most suitable available route at time of booking. If you have a strong airline preference, mention it in the Special Requests field and we\'ll do our best to accommodate.' },
+      { q: 'Are airport transfers included?', a: 'Most packages include arrival and departure airport transfers. The specific transfer type (private cab, shared shuttle, or train) is listed in the package inclusions. Check your booking confirmation for transfer details.' },
+      { q: 'What if my flight is delayed and I miss a connection?', a: 'For flights arranged by Voyara, we actively monitor your journey and arrange alternative connections at no extra cost. If you booked your own flights, please contact your airline directly — travel insurance may cover extra expenses.' },
+    ]
+  },
+  hotels: {
+    title: 'Hotels & Stays',
+    sub: '16 articles on hotels, check-in, and accommodation.',
+    items: [
+      { q: 'What do the hotel star ratings mean?', a: 'Voyara uses international star classifications. 3-star hotels offer quality rooms with standard amenities. 4-star adds superior facilities and dining. 5-star provides luxury amenities, concierge, spa, and personalised service. Our team vets all properties.' },
+      { q: 'What is the standard check-in and check-out time?', a: 'Most hotels check in at 2–3 PM and check out at 11 AM–12 PM. Early check-in and late check-out may be available on request. Voyara can add this as a paid supplement during booking.' },
+      { q: 'Can I request specific room types or floors?', a: 'Yes — note your preferences in the Special Requests field at checkout. While we pass all requests to the hotel, specific room assignments are subject to availability on arrival.' },
+      { q: 'Can I upgrade my accommodation after booking?', a: 'Yes, upgrades are possible subject to availability and the difference in room rate. Contact support or log in to My Trips → Modify Booking to explore upgrade options.' },
+    ]
+  },
+  insurance: {
+    title: 'Travel Insurance',
+    sub: '10 articles on coverage, claims, and emergency support.',
+    items: [
+      { q: 'Does Voyara offer travel insurance?', a: 'Yes. We partner with Bajaj Allianz and Tata AIG to offer comprehensive travel insurance plans. These can be added to any package at checkout. We strongly recommend insurance for all international trips.' },
+      { q: 'What does travel insurance typically cover?', a: 'Standard coverage includes: trip cancellation/interruption, medical expenses abroad, emergency evacuation, lost/delayed baggage, flight delays, and passport loss. Premium plans add adventure sports and rental car cover.' },
+      { q: 'How do I make an insurance claim?', a: 'In case of an emergency, call the 24/7 insurance helpline printed on your policy doc. For non-emergency claims, submit documents online via the insurer\'s portal. Voyara\'s support team can assist with claim guidance.' },
+      { q: 'Is travel insurance mandatory for international trips?', a: 'Some countries (all Schengen EU countries, UAE, Sri Lanka) legally require travel insurance with minimum medical cover as part of the visa application. Voyara automatically flags these requirements for relevant bookings.' },
+    ]
+  },
+  account: {
+    title: 'My Account',
+    sub: '9 articles on your Voyara profile and account settings.',
+    items: [
+      { q: 'How do I create a Voyara account?', a: 'Click "Login" → "Create Account" in the top navigation. Enter your name, email, phone, and a secure password. You\'ll receive a verification email — click the link to activate your account.' },
+      { q: 'I forgot my password — how do I reset it?', a: 'On the login page, click "Forgot password?" and enter your registered email. You\'ll receive a reset link valid for 30 minutes. If you don\'t receive it, check spam or contact support@voyara.in.' },
+      { q: 'How do I update my profile details?', a: 'Login → My Trips → Settings tab → update your name, phone, email, or password. Changes to email require verification via a confirmation link sent to both old and new addresses.' },
+      { q: 'Can I have multiple travellers under one account?', a: 'Yes. In your account settings, you can add "Saved Travellers" — enter details for family members once and auto-fill them at checkout. Great for frequent family trips.' },
+    ]
+  }
+};
+
+const POPULAR_ARTICLES = [
+  { cat: 'Bookings', title: 'How to book a group trip for 10+ people', time: '3 min read', helpful: 94 },
+  { cat: 'Cancellations', title: 'Step-by-step guide to cancelling your booking', time: '2 min read', helpful: 98 },
+  { cat: 'Visa & Documents', title: 'Schengen visa document checklist for Indian citizens', time: '5 min read', helpful: 97 },
+  { cat: 'Payments', title: 'Why is my payment not going through? Common fixes', time: '2 min read', helpful: 91 },
+  { cat: 'Insurance', title: 'What travel insurance actually covers (and what it doesn\'t)', time: '4 min read', helpful: 89 },
+  { cat: 'Hotels', title: 'Early check-in and late check-out: how to request it', time: '2 min read', helpful: 86 },
+];
+
+// ─── Render topic cards ─────────────────────────────────────────────────
+let activeTopic = 'bookings';
+const topicGrid = document.getElementById('topicGrid');
+TOPICS.forEach(t => {
+  const card = document.createElement('div');
+  card.className = 'topic-card' + (t.id === activeTopic ? ' active' : '');
+  card.innerHTML = `<div class="topic-icon">${t.icon}</div><div class="topic-title">${t.title}</div><div class="topic-count">${t.count} articles</div>`;
+  card.onclick = () => switchTopic(t.id);
+  topicGrid.appendChild(card);
+});
+
+// ─── Render sidebar nav ─────────────────────────────────────────────────
+const hcNav = document.getElementById('hcNav');
+TOPICS.forEach(t => {
+  const link = document.createElement('div');
+  link.className = 'hc-nav-link' + (t.id === activeTopic ? ' active' : '');
+  link.id = 'nav-' + t.id;
+  link.innerHTML = `<span>${t.icon}</span><span>${t.title}</span><span class="hc-nav-count">${t.count}</span>`;
+  link.onclick = () => switchTopic(t.id);
+  hcNav.appendChild(link);
+});
+
+// ─── Render FAQ panels ──────────────────────────────────────────────────
+const hcPanels = document.getElementById('hcPanels');
+Object.entries(FAQS).forEach(([id, data]) => {
+  const panel = document.createElement('div');
+  panel.className = 'faq-panel' + (id === activeTopic ? ' active' : '');
+  panel.id = 'panel-' + id;
+  panel.innerHTML = `
+    <div class="faq-panel-title">${data.title}</div>
+    <p class="faq-panel-sub">${data.sub}</p>
+    <div class="faq-list" id="faq-${id}"></div>`;
+  hcPanels.appendChild(panel);
+  renderFAQs(id, data.items);
+});
+
+function renderFAQs(topicId, items) {
+  const list = document.getElementById('faq-' + topicId);
+  if (!list) return;
+  list.innerHTML = '';
+  items.forEach((f, i) => {
+    const item = document.createElement('div');
+    item.className = 'faq-item';
+    item.innerHTML = `
+      <div class="faq-q" onclick="toggleFAQ(this)">
+        <span>${f.q}</span>
+        <span class="faq-chevron">⌄</span>
+      </div>
+      <div class="faq-a">${f.a}<div class="faq-tags"><span class="faq-tag">📋 Article #${topicId}-${i+1}</span><span class="faq-tag">Was this helpful? <button onclick="markHelpful(this)" style="margin-left:6px;background:none;border:none;cursor:pointer;color:var(--ac);">👍 Yes</button></span></div></div>`;
+    list.appendChild(item);
+  });
+}
+
+function toggleFAQ(btn) {
+  const item = btn.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+  btn.closest('.faq-list').querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+function markHelpful(btn) {
+  btn.textContent = '✅ Thanks!';
+  btn.disabled = true;
+}
+
+// ─── Switch topic ───────────────────────────────────────────────────────
+function switchTopic(id) {
+  activeTopic = id;
+  document.querySelectorAll('.topic-card').forEach((c, i) => {
+    c.classList.toggle('active', TOPICS[i].id === id);
+  });
+  document.querySelectorAll('.hc-nav-link').forEach(l => {
+    l.classList.toggle('active', l.id === 'nav-' + id);
+  });
+  document.getElementById('searchResultsPanel').style.display = 'none';
+  document.querySelectorAll('.faq-panel').forEach(p => {
+    p.classList.toggle('active', p.id === 'panel-' + id);
+  });
+  document.getElementById('hcSearchInput').value = '';
+  document.querySelector('.hc-inner').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─── Search across all FAQs ─────────────────────────────────────────────
+function hcSearch() {
+  const q = document.getElementById('hcSearchInput').value.trim().toLowerCase();
+  if (!q) {
+    document.getElementById('searchResultsPanel').style.display = 'none';
+    switchTopic(activeTopic);
+    return;
+  }
+
+  const results = [];
+  Object.entries(FAQS).forEach(([id, data]) => {
+    data.items.forEach(f => {
+      if (f.q.toLowerCase().includes(q) || f.a.toLowerCase().includes(q)) {
+        results.push({ ...f, topic: data.title });
+      }
+    });
+  });
+
+  // Hide all panels, show search results
+  document.querySelectorAll('.faq-panel').forEach(p => p.classList.remove('active'));
+  const srPanel = document.getElementById('searchResultsPanel');
+  const srCount = document.getElementById('searchResultsCount');
+  const srList  = document.getElementById('searchResultsList');
+  srPanel.style.display = 'block';
+  srCount.innerHTML = results.length
+    ? `Found <strong>${results.length}</strong> article${results.length !== 1 ? 's' : ''} matching "<em>${q}</em>"`
+    : `No results found for "<em>${q}</em>". Try different keywords or <a href="contact.html" style="color:var(--ac);">contact us</a>.`;
+
+  srList.innerHTML = '';
+  results.forEach((f, i) => {
+    const item = document.createElement('div');
+    item.className = 'faq-item';
+    const highlight = (text) => text.replace(new RegExp(`(${q})`, 'gi'), '<mark class="highlight">$1</mark>');
+    item.innerHTML = `
+      <div class="faq-q" onclick="toggleFAQ(this)">
+        <span>${highlight(f.q)} <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:8px;">${f.topic}</span></span>
+        <span class="faq-chevron">⌄</span>
+      </div>
+      <div class="faq-a">${highlight(f.a)}</div>`;
+    srList.appendChild(item);
+  });
+}
+
+// Enter key triggers search
+document.getElementById('hcSearchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') hcSearch();
+});
+
+// ─── Popular Articles ───────────────────────────────────────────────────
+const articleGrid = document.getElementById('articleGrid');
+POPULAR_ARTICLES.forEach(a => {
+  const card = document.createElement('div');
+  card.className = 'article-card';
+  card.innerHTML = `
+    <div class="article-cat">${a.cat}</div>
+    <div class="article-title">${a.title}</div>
+    <div class="article-meta">
+      <span>📖 ${a.time}</span>
+      <span style="color:var(--ac)">👍 ${a.helpful}% helpful</span>
+    </div>
+    <div class="article-helpful">
+      <span>Was this helpful?</span>
+      <button class="helpful-btn" onclick="markHelpfulArticle(this,'👍')">👍 Yes</button>
+      <button class="helpful-btn" onclick="markHelpfulArticle(this,'👎')">👎 No</button>
+    </div>`;
+  articleGrid.appendChild(card);
+});
+
+function markHelpfulArticle(btn, vote) {
+  const row = btn.closest('.article-helpful');
+  row.innerHTML = vote === '👍'
+    ? '<span style="color:var(--ac);font-size:13px;">✅ Thanks for the feedback!</span>'
+    : '<span style="color:var(--ts);font-size:13px;">Thanks — we\'ll improve this article.</span>';
+}
+</script>
+</body>
+</html>

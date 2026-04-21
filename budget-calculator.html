@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Calculator — Voyara</title>
+<link rel="stylesheet" href="style.css">
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<style>
+/* ── PREMIUM CALCULATOR STYLES ── */
+:root {
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --panel-bg: rgba(255, 255, 255, 0.7);
+  --accent-gradient: linear-gradient(135deg, var(--ac) 0%, var(--ach) 100%);
+  --shadow-premium: 0 10px 40px -10px rgba(0,0,0,0.12);
+}
+
+.calc-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 48px;
+  align-items: start;
+}
+
+/* Panel Design */
+.calc-panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: var(--ssh);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.calc-panel:hover {
+  box-shadow: var(--shadow-premium);
+}
+.calc-panel-header {
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(to right, var(--off), transparent);
+}
+.calc-panel-icon { font-size: 22px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+.calc-panel-body { padding: 32px; }
+
+/* Interactive Elements */
+.nights-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 12px; }
+.night-btn {
+  padding: 12px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--rs);
+  background: var(--white);
+  font-family: var(--fb);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--ts);
+}
+.night-btn:hover { border-color: var(--text); color: var(--text); transform: translateY(-1px); }
+.night-btn.active { background: var(--text); color: var(--white); border-color: var(--text); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+
+.hotel-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+.hotel-tier {
+  border: 1.5px solid var(--border);
+  border-radius: var(--rs);
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  background: var(--white);
+}
+.hotel-tier:hover { border-color: var(--ac); background: var(--acl); }
+.hotel-tier.active { background: var(--ac); color: white; border-color: var(--ac); box-shadow: 0 4px 15px rgba(42, 107, 79, 0.3); }
+.hotel-tier .tier-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.hotel-tier .tier-price { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; }
+.hotel-tier.active .tier-price { color: rgba(255,255,255,0.7); }
+
+/* Custom Sliders */
+.range-field { margin-bottom: 28px; }
+.range-field label { font-size: 14px; font-weight: 600; color: var(--text); display: flex; justify-content: space-between; margin-bottom: 12px; }
+.range-field label span { color: var(--ac); font-family: var(--fb); font-weight: 700; font-size: 15px; }
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 5px;
+  outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--white);
+  border: 3px solid var(--ac);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(42, 107, 79, 0.1); }
+
+/* Summary Island */
+.summary-container {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--sh);
+}
+.summary-header {
+  padding: 24px 28px;
+  background: var(--text);
+  color: white;
+}
+.summary-header h3 { font-family: var(--fd); font-size: 20px; color: white; }
+.summary-header p { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+.summary-body { padding: 32px 28px; }
+
+/* Donut Chart with shadow */
+.budget-donut {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--text) 0% var(--flight-pct, 0%),
+    var(--ac) var(--flight-pct, 0%) var(--hotel-end, 0%),
+    #5dcaa5 var(--hotel-end, 0%) var(--food-end, 0%),
+    #85b7eb var(--food-end, 0%) var(--act-end, 0%),
+    var(--border) var(--act-end, 0%) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 0 auto 32px;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.05), 0 8px 30px rgba(0,0,0,0.05);
+  transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.donut-hole {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+.donut-total { font-family: var(--fd); font-size: 24px; font-weight: 700; color: var(--text); }
+.donut-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; }
+
+.legend { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+.legend-item { display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
+.legend-name { display: flex; align-items: center; gap: 10px; color: var(--ts); font-weight: 500; }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.legend-val { font-weight: 600; color: var(--text); }
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+.item-label { color: var(--ts); }
+.item-price { font-weight: 600; color: var(--text); }
+
+.grand-total-box {
+  background: var(--off);
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  padding: 18px 20px;
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+.grand-total-box:hover { border-color: var(--ac); background: var(--acl); }
+.total-label { font-size: 14px; font-weight: 700; color: var(--text); }
+.total-amount { font-family: var(--fd); font-size: 28px; font-weight: 400; color: var(--text); }
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--off);
+}
+.activity-left { display: flex; align-items: center; gap: 12px; }
+.activity-toggle { 
+  width: 20px; height: 20px; 
+  accent-color: var(--ac); 
+  cursor: pointer;
+  border-radius: 4px; 
+}
+.activity-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.activity-cost { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.suggest-card {
+  background: var(--wb);
+  border: 1px solid var(--warn);
+  border-radius: var(--rs);
+  padding: 18px;
+  margin-top: 20px;
+}
+.suggest-card strong { color: var(--warn); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+.suggest-card p { color: var(--ts); font-size: 13px; line-height: 1.5; margin-top: 6px; }
+
+.dest-preset { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.preset-btn {
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  border-radius: var(--rs);
+  padding: 12px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.preset-btn:hover { border-color: var(--ac); background: var(--acl); transform: scale(1.02); }
+.preset-btn .flag { font-size: 20px; display: block; margin-bottom: 6px; }
+.preset-btn .name { font-size: 13px; font-weight: 600; color: var(--text); }
+.preset-btn .est { font-size: 11px; color: var(--ac); margin-top: 4px; }
+
+@media (max-width: 1000px) {
+  .calc-layout { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+  <nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="navbar-brand">Voy<span>era</span></a>
+
+    <nav class="navbar-nav">
+      <a href="destinations.html">Destinations</a>
+      <a href="packages.html">Packages</a>
+      <a href="search.html">Search</a>
+      <a href="blog.html">Blog</a>
+      <a href="about.html">About</a>
+    </nav>
+
+    <div class="navbar-actions">
+      <a href="login.html" class="btn btn-ghost btn-sm active">Login</a>
+      <a href="booking.html" class="btn btn-outline btn-sm">Book Now</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="container">
+    <p class="label mb-8">Plan Smarter</p>
+    <h1 class="heading-1 mb-12">Trip Budget Calculator</h1>
+    <p class="subtext" style="max-width:480px;">Estimate how much your dream trip will cost — flights, hotels, food, activities and more.</p>
+  </div>
+</div>
+
+<main>
+  <div class="container" style="padding-bottom: 72px;">
+    <div class="calc-layout">
+
+      <!-- Left: Inputs -->
+      <div>
+
+        <!-- Destination Presets -->
+        <div class="calc-panel">
+          <div class="calc-panel-header">
+            <span class="calc-panel-icon">🌍</span>
+            <div><h3 class="heading-3">Quick Preset</h3><p style="font-size:12px;color:var(--ts);">Pick a destination to pre-fill estimates</p></div>
+          </div>
+          <div class="calc-panel-body">
+            <div class="dest-preset">
+              <button class="preset-btn" onclick="loadPreset('goa')"><span class="flag">🏖</span><span class="name">Goa</span><span class="est">From ₹20k</span></button>
+              <button class="preset-btn" onclick="loadPreset('bali')"><span class="flag">🌴</span><span class="name">Bali</span><span class="est">From ₹60k</span></button>
+              <button class="preset-btn" onclick="loadPreset('dubai')"><span class="flag">🏙</span><span class="name">Dubai</span><span class="est">From ₹65k</span></button>
+              <button class="preset-btn" onclick="loadPreset('europe')"><span class="flag">🏛</span><span class="name">Europe</span><span class="est">From ₹1.1L</span></button>
+              <button class="preset-btn" onclick="loadPreset('japan')"><span class="flag">🗾</span><span class="name">Japan</span><span class="est">From ₹1.5L</span></button>
+              <button class="preset-btn" onclick="loadPreset('maldives')"><span class="flag">🐠</span><span class="name">Maldives</span><span class="est">From ₹2.5L</span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trip Basics -->
+        <div class="calc-panel">
+          <div class="calc-panel-header"><span class="calc-panel-icon">📋</span><h3 class="heading-3">Trip Basics</h3></div>
+          <div class="calc-panel-body">
+            <div class="form-group mb-24">
+              <label class="form-label">Number of Travellers</label>
+              <div class="flex items-center gap-16 mt-8">
+                <button class="night-btn" style="width:40px;height:40px;padding:0;" onclick="changeTravellers(-1)">−</button>
+                <span id="travellers-val" style="font-size:22px;font-weight:700;color:var(--text);min-width:24px;text-align:center;">2</span>
+                <button class="night-btn" style="width:40px;height:40px;padding:0;" onclick="changeTravellers(1)">+</button>
+                <span style="font-size:13px;color:var(--ts);margin-left:8px;">Total group members</span>
+              </div>
+            </div>
+            <div class="form-group mb-4">
+              <label class="form-label">Number of Nights</label>
+            </div>
+            <div class="nights-grid mb-8">
+              <button class="night-btn" onclick="setNights(3, this)">3 nights</button>
+              <button class="night-btn active" onclick="setNights(5, this)">5 nights</button>
+              <button class="night-btn" onclick="setNights(7, this)">7 nights</button>
+              <button class="night-btn" onclick="setNights(10, this)">10 nights</button>
+              <button class="night-btn" onclick="setNights(14, this)">14 nights</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flights -->
+        <div class="calc-panel">
+          <div class="calc-panel-header"><span class="calc-panel-icon">✈</span><h3 class="heading-3">Flights</h3></div>
+          <div class="calc-panel-body">
+            <div class="range-field">
+              <label>Flight cost per person <span id="flight-pp-label">₹25,000</span></label>
+              <input type="range" min="3000" max="200000" step="1000" value="25000" id="flight-pp" oninput="updateCalc()">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--ts);margin-top:8px;"><span>₹3k (domestic)</span><span>₹2L (long-haul)</span></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Flight Class</label>
+              <select class="form-select" id="flight-class" onchange="updateCalc()">
+                <option value="1">Economy</option>
+                <option value="1.5">Premium Economy (+50%)</option>
+                <option value="2.2">Business Class (+120%)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hotel -->
+        <div class="calc-panel">
+          <div class="calc-panel-header"><span class="calc-panel-icon">🏨</span><h3 class="heading-3">Accommodation</h3></div>
+          <div class="calc-panel-body">
+            <div class="hotel-tiers mb-24" id="hotel-tiers">
+              <div class="hotel-tier" onclick="setHotelTier(1500, this)"><div class="tier-name">Budget</div><div class="tier-price">~₹1,500/night</div></div>
+              <div class="hotel-tier active" onclick="setHotelTier(4500, this)"><div class="tier-name">Standard</div><div class="tier-price">~₹4,500/night</div></div>
+              <div class="hotel-tier" onclick="setHotelTier(10000, this)"><div class="tier-name">Luxury</div><div class="tier-price">~₹10,000+/night</div></div>
+            </div>
+            <div class="range-field">
+              <label>Hotel cost per night <span id="hotel-night-label">₹4,500</span></label>
+              <input type="range" min="1000" max="30000" step="500" value="4500" id="hotel-night" oninput="updateCalc()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Food & Daily -->
+        <div class="calc-panel">
+          <div class="calc-panel-header"><span class="calc-panel-icon">🍜</span><h3 class="heading-3">Food & Daily Expenses</h3></div>
+          <div class="calc-panel-body">
+            <div class="range-field">
+              <label>Food budget per person per day <span id="food-day-label">₹1,500</span></label>
+              <input type="range" min="300" max="8000" step="100" value="1500" id="food-day" oninput="updateCalc()">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--ts);margin-top:8px;"><span>Street food</span><span>Fine dining</span></div>
+            </div>
+            <div class="range-field">
+              <label>Local transport per day <span id="transport-day-label">₹500</span></label>
+              <input type="range" min="100" max="5000" step="100" value="500" id="transport-day" oninput="updateCalc()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Activities -->
+        <div class="calc-panel">
+          <div class="calc-panel-header"><span class="calc-panel-icon">🎯</span><h3 class="heading-3">Activities & Sightseeing</h3></div>
+          <div class="calc-panel-body">
+            <div id="activities-list">
+              <div class="activity-item"><div class="activity-left"><input class="activity-toggle" type="checkbox" id="act1" checked onchange="updateCalc()"><div class="activity-info"><div class="activity-name">Guided city tours</div><div class="activity-cost">₹1,500 / person</div></div></div></div>
+              <div class="activity-item"><div class="activity-left"><input class="activity-toggle" type="checkbox" id="act2" onchange="updateCalc()"><div class="activity-info"><div class="activity-name">Adventure sport</div><div class="activity-cost">₹2,500 / person</div></div></div></div>
+              <div class="activity-item"><div class="activity-left"><input class="activity-toggle" type="checkbox" id="act3" checked onchange="updateCalc()"><div class="activity-info"><div class="activity-name">Museum & entry tickets</div><div class="activity-cost">₹800 / person</div></div></div></div>
+              <div class="activity-item"><div class="activity-left"><input class="activity-toggle" type="checkbox" id="act4" onchange="updateCalc()"><div class="activity-info"><div class="activity-name">Day cruise / boat tour</div><div class="activity-cost">₹3,000 / person</div></div></div></div>
+              <div class="activity-item"><div class="activity-left"><input class="activity-toggle" type="checkbox" id="act5" onchange="updateCalc()"><div class="activity-info"><div class="activity-name">Spa / wellness day</div><div class="activity-cost">₹2,000 / person</div></div></div></div>
+              <div class="activity-item"><div class="activity-left"><input class="activity-toggle" type="checkbox" id="act6" onchange="updateCalc()"><div class="activity-info"><div class="activity-name">Cooking class / tasting</div><div class="activity-cost">₹1,200 / person</div></div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Extras -->
+        <div class="calc-panel">
+          <div class="calc-panel-header"><span class="calc-panel-icon">🧳</span><h3 class="heading-3">Extras</h3></div>
+          <div class="calc-panel-body">
+            <div class="range-field">
+              <label>Shopping & souvenirs <span id="shopping-label">₹3,000</span></label>
+              <input type="range" min="0" max="50000" step="500" value="3000" id="shopping" oninput="updateCalc()">
+            </div>
+            <div class="range-field">
+              <label>Travel insurance (total) <span id="insurance-label">₹5,000</span></label>
+              <input type="range" min="0" max="20000" step="500" value="5000" id="insurance" oninput="updateCalc()">
+            </div>
+            <div class="range-field">
+              <label>Visa & airport fees <span id="visa-label">₹8,000</span></label>
+              <input type="range" min="0" max="30000" step="500" value="8000" id="visa" oninput="updateCalc()">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right: Summary Island -->
+      <div class="summary-island">
+        <div class="summary-container">
+
+          <div class="summary-header">
+            <h3>Budget Summary</h3>
+            <p>Estimates based on your selections</p>
+          </div>
+
+          <div class="summary-body">
+
+            <!-- Donut -->
+            <div class="budget-donut" id="donut">
+              <div class="donut-hole">
+                <div class="donut-total" id="donut-total">₹0</div>
+                <div class="donut-label">estimated total</div>
+              </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+              <div class="legend-item"><div class="legend-name"><div class="legend-dot" style="background:var(--text);"></div>Flights</div><span class="legend-val" id="leg-flights">₹0</span></div>
+              <div class="legend-item"><div class="legend-name"><div class="legend-dot" style="background:var(--ac);"></div>Hotel</div><span class="legend-val" id="leg-hotel">₹0</span></div>
+              <div class="legend-item"><div class="legend-name"><div class="legend-dot" style="background:#5dcaa5;"></div>Food & Transport</div><span class="legend-val" id="leg-food">₹0</span></div>
+              <div class="legend-item"><div class="legend-name"><div class="legend-dot" style="background:#85b7eb;"></div>Activities</div><span class="legend-val" id="leg-act">₹0</span></div>
+              <div class="legend-item"><div class="legend-name"><div class="legend-dot" style="background:var(--border);"></div>Extras</div><span class="legend-val" id="leg-extra">₹0</span></div>
+            </div>
+
+            <div style="border-top:1px solid var(--border);padding-top:24px;">
+              <div class="item-row">
+                <span class="item-label">Per person</span>
+                <span class="item-price" id="per-person">₹0</span>
+              </div>
+              <div class="item-row">
+                <span class="item-label">Per day (group)</span>
+                <span class="item-price" id="per-day">₹0</span>
+              </div>
+              
+              <div class="grand-total-box">
+                <span class="total-label">Total Estimate</span>
+                <span id="grand-total" class="total-amount">₹0</span>
+              </div>
+            </div>
+
+            <!-- Suggest matching package -->
+            <div class="suggest-card" id="suggest-card">
+              <strong>✦ Matching Package</strong>
+              <p id="suggest-text">Adjust your budget to see matching packages.</p>
+              <a href="packages.html" class="btn btn-primary btn-full mt-12">Browse Packages →</a>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="sidebar-card mt-16">
+          <p class="sidebar-title">Tips to save</p>
+          <div class="flex-col gap-10" style="font-size:13px;">
+            <div class="flex gap-8 items-center"><span>💡</span><span style="color:var(--ts);">Book flights 6–8 weeks ahead for best prices</span></div>
+            <div class="flex gap-8 items-center"><span>💡</span><span style="color:var(--ts);">Travel shoulder season (Apr–May, Sep–Oct)</span></div>
+            <div class="flex gap-8 items-center"><span>💡</span><span style="color:var(--ts);">Our packages include 15–25% savings vs booking separately</span></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><div class="footer-logo">Voy<span>ara</span></div><p class="footer-desc">Crafting unforgettable travel experiences since 2018.</p></div>
+      <div><p class="footer-heading">Explore</p><ul class="footer-links"><li><a href="destinations.html">Destinations</a></li><li><a href="packages.html">Packages</a></li></ul></div>
+      <div><p class="footer-heading">Company</p><ul class="footer-links"><li><a href="about.html">About</a></li></ul></div>
+      <div><p class="footer-heading">Support</p><ul class="footer-links"><li><a href="help-center.html">Help</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p class="footer-copy">© 2025 Voyara. All rights reserved.</p></div>
+  </div>
+</footer>
+
+<script>
+let travellers = 2, nights = 5, hotelPerNight = 4500;
+
+const actCosts = [1500, 2500, 800, 3000, 2000, 1200];
+
+function changeTravellers(d) {
+  travellers = Math.max(1, travellers + d);
+  document.getElementById('travellers-val').textContent = travellers;
+  updateCalc();
+}
+
+function setNights(n, el) {
+  nights = n;
+  document.querySelectorAll('.night-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  updateCalc();
+}
+
+function setHotelTier(price, el) {
+  hotelPerNight = price;
+  document.querySelectorAll('.hotel-tier').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('hotel-night').value = price;
+  document.getElementById('hotel-night-label').textContent = '₹' + price.toLocaleString('en-IN');
+  updateCalc();
+}
+
+function fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
+
+function updateCalc() {
+  const flightPP = +document.getElementById('flight-pp').value;
+  const flightClass = +document.getElementById('flight-class').value;
+  const hotelNight = +document.getElementById('hotel-night').value;
+  const foodDay = +document.getElementById('food-day').value;
+  const transportDay = +document.getElementById('transport-day').value;
+  const shopping = +document.getElementById('shopping').value;
+  const insurance = +document.getElementById('insurance').value;
+  const visa = +document.getElementById('visa').value;
+
+  document.getElementById('flight-pp-label').textContent = fmt(flightPP);
+  document.getElementById('hotel-night-label').textContent = fmt(hotelNight);
+  document.getElementById('food-day-label').textContent = fmt(foodDay);
+  document.getElementById('transport-day-label').textContent = fmt(transportDay);
+  document.getElementById('shopping-label').textContent = fmt(shopping);
+  document.getElementById('insurance-label').textContent = fmt(insurance);
+  document.getElementById('visa-label').textContent = fmt(visa);
+
+  const flightTotal = flightPP * flightClass * travellers * 2; // return
+  const hotelTotal = hotelNight * nights;
+  const foodTotal = (foodDay + transportDay) * nights * travellers;
+  let actTotal = 0;
+  for (let i = 0; i < 6; i++) {
+    if (document.getElementById('act' + (i+1)).checked) actTotal += actCosts[i] * travellers;
+  }
+  const extraTotal = shopping + insurance + visa;
+  const grand = flightTotal + hotelTotal + foodTotal + actTotal + extraTotal;
+
+  document.getElementById('leg-flights').textContent = fmt(flightTotal);
+  document.getElementById('leg-hotel').textContent = fmt(hotelTotal);
+  document.getElementById('leg-food').textContent = fmt(foodTotal);
+  document.getElementById('leg-act').textContent = fmt(actTotal);
+  document.getElementById('leg-extra').textContent = fmt(extraTotal);
+  document.getElementById('grand-total').textContent = fmt(grand);
+  document.getElementById('donut-total').textContent = fmt(grand);
+  document.getElementById('per-person').textContent = fmt(grand / travellers);
+  document.getElementById('per-day').textContent = fmt(grand / nights);
+
+  // Update donut chart
+  const fp = grand > 0 ? (flightTotal / grand * 100).toFixed(1) : 0;
+  const hp = grand > 0 ? ((flightTotal + hotelTotal) / grand * 100).toFixed(1) : 0;
+  const fdp = grand > 0 ? ((flightTotal + hotelTotal + foodTotal) / grand * 100).toFixed(1) : 0;
+  const ap = grand > 0 ? ((flightTotal + hotelTotal + foodTotal + actTotal) / grand * 100).toFixed(1) : 0;
+  const donut = document.getElementById('donut');
+  donut.style.setProperty('--flight-pct', fp + '%');
+  donut.style.setProperty('--hotel-end', hp + '%');
+  donut.style.setProperty('--food-end', fdp + '%');
+  donut.style.setProperty('--act-end', ap + '%');
+
+  // Suggest package
+  const txt = document.getElementById('suggest-text');
+  if (grand < 30000) txt.textContent = 'Check out our Goa Getaway — perfect for this budget.';
+  else if (grand < 100000) txt.textContent = 'The Bali Trek package fits your estimate nicely!';
+  else if (grand < 200000) txt.textContent = 'Our Santorini or Japan packages match this budget.';
+  else txt.textContent = 'The Maldives Overwater Villa is perfect for your luxury budget!';
+}
+
+function loadPreset(dest) {
+  const presets = {
+    goa:     { flight: 4000,  hotel: 2500,  food: 800,  nights: 4,  class: 1 },
+    bali:    { flight: 18000, hotel: 4000,  food: 1200, nights: 5,  class: 1 },
+    dubai:   { flight: 20000, hotel: 7000,  food: 2000, nights: 4,  class: 1 },
+    europe:  { flight: 55000, hotel: 6000,  food: 2500, nights: 6,  class: 1 },
+    japan:   { flight: 45000, hotel: 8000,  food: 2500, nights: 7,  class: 1 },
+    maldives:{ flight: 25000, hotel: 25000, food: 3000, nights: 5,  class: 1 },
+    rajasthan: { flight: 8000,  hotel: 3000,  food: 1500, nights: 7,  class: 1 },
+    manali:  { flight: 5000,  hotel: 2000,  food: 1000, nights: 5,  class: 1 },
+    london:  { flight: 55000, hotel: 8000,  food: 3000, nights: 6,  class: 1 },
+    swiss:   { flight: 60000, hotel: 12000, food: 4000, nights: 6,  class: 1 },
+  };
+  const p = presets[dest] || presets.bali;
+  document.getElementById('flight-pp').value = p.flight;
+  document.getElementById('hotel-night').value = p.hotel;
+  document.getElementById('food-day').value = p.food;
+  nights = p.nights;
+  document.querySelectorAll('.night-btn').forEach((b,i) => {
+    b.classList.toggle('active', [3,5,7,10,14][i] === p.nights);
+  });
+  hotelPerNight = p.hotel;
+  updateCalc();
+}
+
+// Init
+const params = new URLSearchParams(window.location.search);
+if (params.get('preset')) loadPreset(params.get('preset'));
+else updateCalc();
+</script>
+</body>
+</html>

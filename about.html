@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us — Voyara</title>
+<link rel="stylesheet" href="style.css">
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<style>
+/* Page Specific Premium Aesthetics */
+.about-hero { min-height: 80vh; display: flex; align-items: center; justify-content: center; position: relative; background: #000; overflow: hidden; padding: 120px 24px; }
+.about-hero-bg { position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1400&q=80') center/cover no-repeat; opacity: 0.6; filter: brightness(0.8); }
+.about-hero-content { position: relative; z-index: 10; text-align: center; max-width: 800px; padding: 64px 48px; border-radius: var(--r); }
+
+.stats-strip { background: var(--off); border-bottom: 1px solid var(--border); padding: 64px 0; }
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+.stats-cell { text-align: center; }
+.stats-num { font-family: var(--fd); font-size: 48px; font-weight: 400; color: var(--text); line-height: 1; margin-bottom: 8px; display: block; }
+.stats-label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+
+.mission-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+.img-stack { position: relative; padding-bottom: 20px; }
+.img-stack-main { width: 100%; border-radius: var(--r); box-shadow: var(--sh-lg); position: relative; z-index: 2; }
+.img-stack-sub { position: absolute; bottom: -20px; right: -20px; width: 60%; border-radius: var(--rs); box-shadow: var(--sh); border: 8px solid var(--white); z-index: 3; }
+
+.value-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r); padding: 32px; transition: all 0.3s ease; height: 100%; }
+.value-card:hover { transform: translateY(-5px); box-shadow: var(--sh); border-color: var(--ac); }
+.value-icon { width: 48px; height: 48px; background: var(--acl); color: var(--ac); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 20px; }
+
+.timeline { position: relative; padding-left: 32px; border-left: 1.5px solid var(--border); }
+.timeline-item { position: relative; padding-bottom: 48px; }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-dot { position: absolute; left: -40px; top: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--white); border: 3px solid var(--ac); z-index: 10; }
+.timeline-year { font-family: var(--fd); font-size: 20px; color: var(--ac); display: block; margin-bottom: 4px; }
+
+.team-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; transition: all 0.3s ease; }
+.team-card:hover { transform: translateY(-5px); box-shadow: var(--sh-lg); }
+.team-img-wrapper { position: relative; aspect-ratio: 4/5; overflow: hidden; background: var(--light); }
+.team-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+.team-card:hover .team-img { transform: scale(1.05); }
+.team-info { padding: 24px; text-align: center; }
+.team-role { font-size: 12px; font-weight: 600; color: var(--ac); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; display: block; }
+
+.partner-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 24px; }
+.partner-box { text-align: center; filter: grayscale(1); opacity: 0.6; transition: all 0.3s ease; padding: 20px; background: var(--white); border: 1px solid var(--border); border-radius: var(--rs); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.partner-box:hover { filter: grayscale(0); opacity: 1; border-color: var(--ac); transform: scale(1.05); box-shadow: var(--sh); }
+.partner-logo { width: 48px; height: 48px; object-fit: contain; }
+.partner-name { font-size: 13px; font-weight: 500; color: var(--text); }
+
+@media (max-width: 768px) {
+  .mission-grid, .stats-row { grid-template-columns: 1fr; gap: 40px; }
+  .partner-grid { grid-template-columns: repeat(2, 1fr); }
+  .about-hero-content { padding: 40px 24px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="navbar-brand">Voy<span>ara</span></a>
+    <nav class="navbar-nav">
+      <a href="destinations.html">Destinations</a>
+      <a href="packages.html">Packages</a>
+      <a href="search.html">Search</a>
+      <a href="blog.html">Blog</a>
+      <a href="about.html" class="active">About</a>
+    </nav>
+    <div class="navbar-actions">
+      <a href="login.html" class="btn btn-ghost btn-sm">Login</a>
+      <a href="booking.html" class="btn btn-primary btn-sm">Book Now</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="about-hero">
+  <div class="about-hero-bg"></div>
+  <div class="about-hero-content glass-dark">
+    <span class="label" style="color:var(--acl); margin-bottom:16px; letter-spacing:4px;">OUR STORY</span>
+    <h1 class="display" style="color:var(--white); margin-bottom:24px;">Extraordinary journeys start with a simple step.</h1>
+    <p class="lead" style="color:rgba(255,255,255,0.7); max-width:600px; margin:0 auto;">Voyara was founded on the belief that travel isn't just about the places you go, but the stories you carry back with you.</p>
+  </div>
+</section>
+
+<!-- Stats Strip -->
+<div class="stats-strip">
+  <div class="container">
+    <div class="stats-row">
+      <div class="stats-cell"><span class="stats-num">120k+</span><span class="stats-label">Trips Delivered</span></div>
+      <div class="stats-cell"><span class="stats-num">2.4k+</span><span class="stats-label">Curated Spots</span></div>
+      <div class="stats-cell"><span class="stats-num">98%</span><span class="stats-label">Client Loyalty</span></div>
+      <div class="stats-cell"><span class="stats-num">7yrs+</span><span class="stats-label">Expertise</span></div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <!-- Mission split -->
+  <section class="section">
+    <div class="container">
+      <div class="mission-grid">
+        <div class="img-stack">
+          <img src="https://images.unsplash.com/photo-1539635278303-d4002c07eae3?w=800&q=80" alt="Travel Team" class="img-stack-main">
+          <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&q=80" alt="Planning" class="img-stack-sub">
+        </div>
+        <div>
+          <div class="section-label">OUR MISSION</div>
+          <h2 class="heading-1 mb-24">Redefining the way you see the world.</h2>
+          <p class="subtext lead mb-20 text-gradient" style="font-weight: 500;">We're on a mission to bring soul back to travel by crafting itineraries that matter.</p>
+          <p class="subtext mb-24">Founded in 2018 in a small studio, Voyara has grown into a community of explorers. We're not a travel agency; we're your partner in uncovering the extraordinary. We ditch the cookie-cutter for the curated, and the crowded for the hidden.</p>
+          <div class="flex gap-16">
+            <a href="packages.html" class="btn btn-primary btn-lg">Explore Journeys</a>
+            <a href="contact.html" class="btn btn-outline btn-lg">Talk to an Expert</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Values -->
+  <section class="section" style="background:var(--off); border-top:1px solid var(--border);">
+    <div class="container">
+      <div class="text-center mb-64">
+        <div class="section-label">GUIDING LIGHTS</div>
+        <h2 class="heading-1">Values that ground us</h2>
+      </div>
+      <div class="grid-3">
+        <div class="value-card"><div class="value-icon">✦</div><h3 class="heading-3 mb-12">Human Touch</h3><p style="font-size:14px; color:var(--ts);">Real people, real experiences. Every trip is planned by an expert who has lived the journey.</p></div>
+        <div class="value-card"><div class="value-icon">🌏</div><h3 class="heading-3 mb-12">Responsible Roots</h3><p style="font-size:14px; color:var(--ts);">We empower local communities and promote eco-conscious travel in every package.</p></div>
+        <div class="value-card"><div class="value-icon">💬</div><h3 class="heading-3 mb-12">Total Clarity</h3><p style="font-size:14px; color:var(--ts);">Transparent pricing and honest recommendations. No hidden hooks, just pure adventure.</p></div>
+        <div class="value-card"><div class="value-icon">⚡</div><h3 class="heading-3 mb-12">Always On</h3><p style="font-size:14px; color:var(--ts);">Our concierge team is with you at every time zone, ensuring your trip is as smooth as silk.</p></div>
+        <div class="value-card"><div class="value-icon">🎯</div><h3 class="heading-3 mb-12">True Personalization</h3><p style="font-size:14px; color:var(--ts);">We don't do generic. Every itinerary is built around your unique rhythm and curiosities.</p></div>
+        <div class="value-card"><div class="value-icon">🤝</div><h3 class="heading-3 mb-12">Earned Trust</h3><p style="font-size:14px; color:var(--ts);">Over a hundred thousand guests have trusted us with their dreams. We take that personally.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey Timeline -->
+  <section class="section">
+    <div class="container">
+      <div class="mission-grid" style="gap:100px;">
+        <div>
+          <div class="section-label">OUR JOURNEY</div>
+          <h2 class="heading-1 mb-48">Growing block by block.</h2>
+          <div class="timeline">
+            <div class="timeline-item"><div class="timeline-dot"></div><span class="timeline-year">2018</span><h4 class="heading-3">The First Voyage</h4><p style="font-size:14px;">Launched from a shared flat in Pune with one goal: better travel.</p></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><span class="timeline-year">2020</span><h4 class="heading-3">Resilience & Growth</h4><p style="font-size:14px;">We focused on local travel, discovering the hidden gems of India during a global pause.</p></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><span class="timeline-year">2023</span><h4 class="heading-3">100k Milestone</h4><p style="font-size:14px;">Celebrated 100,000 happy travellers and expanded to 15 international regions.</p></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><span class="timeline-year">2025</span><h4 class="heading-3">The Future is Here</h4><p style="font-size:14px;">Rolling out AI concierge and immersive 360° virtual trip planning.</p></div>
+          </div>
+        </div>
+        <div style="position:relative;">
+          <img src="https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800&q=80" alt="Voyara HQ" style="width:100%; border-radius:var(--r); box-shadow:var(--sh-lg);">
+          <div class="glass" style="position:absolute; bottom:30px; left:-30px; padding:20px; border-radius:var(--rs); width:200px;">
+            <p style="font-size:12px; font-weight:700; color:var(--ac); margin-bottom:4px;">HEADQUARTERS</p>
+            <p style="font-size:14px; font-weight:500;">Pune, India — Where the dream began.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="section" style="background:var(--acl); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+    <div class="container">
+      <div class="text-center mb-64">
+        <div class="section-label">THE ARCHITECTS</div>
+        <h2 class="heading-1">Meet the team</h2>
+      </div>
+      <div class="grid-4">
+        <div class="team-card">
+          <div class="team-img-wrapper"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80" class="team-img" alt="Anika"></div>
+          <div class="team-info"><span class="team-role">CO-FOUNDER & CEO</span><h3 class="heading-3">Anika Verma</h3><p style="font-size:13px; margin-top:8px;">Former McKinsey · 40 countries</p></div>
+        </div>
+        <div class="team-card">
+          <div class="team-img-wrapper"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80" class="team-img" alt="Rohan"></div>
+          <div class="team-info"><span class="team-role">CO-FOUNDER & CTO</span><h3 class="heading-3">Rohan Joshi</h3><p style="font-size:13px; margin-top:8px;">Ex-Google · Solo Trekker</p></div>
+        </div>
+        <div class="team-card">
+          <div class="team-img-wrapper"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80" class="team-img" alt="Meera"></div>
+          <div class="team-info"><span class="team-role">EXP. DIRECTOR</span><h3 class="heading-3">Meera Pillai</h3><p style="font-size:13px; margin-top:8px;">Travel Journalist · 12Y Exp</p></div>
+        </div>
+        <div class="team-card">
+          <div class="team-img-wrapper"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80" class="team-img" alt="Vikram"></div>
+          <div class="team-info"><span class="team-role">GUEST SUCCESS</span><h3 class="heading-3">Vikram Singh</h3><p style="font-size:13px; margin-top:8px;">Obsessed with your joy.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Partners -->
+  <section class="section">
+    <div class="container">
+      <div class="text-center mb-48">
+        <div class="section-label">GLOBAL NETWORK</div>
+        <h2 class="heading-2">Trusted By</h2>
+      </div>
+      <div class="partner-grid">
+        <div class="partner-box">
+          <img src="https://tse3.mm.bing.net/th/id/OIP.S2eb0kizft-qAacUx38e8gHaEK?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Air India" style ="height: 100px; width: 100%;" class="partner-logo">
+          <span class="partner-name">Air India</span>
+        </div>
+        <div class="partner-box">
+          <img src="https://logodix.com/logo/347286.png" alt="IndiGo" style ="height: 100px; width: 100%;" class="partner-logo">
+          <span class="partner-name">IndiGo</span>
+        </div>
+        <div class="partner-box">
+          <img src="https://th.bing.com/th/id/OIP.6kWLtCYPPsSqWKVOuH3R7gHaHa?o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Emirates" style ="height: 100px; width: 100%;" class="partner-logo">
+          <span class="partner-name">Emirates</span>
+        </div>
+        <div class="partner-box">
+          <img src="https://tse1.mm.bing.net/th/id/OIP.LfZ4p_PZwCLyeJneXHJe5QHaEK?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Marriott" style ="height: 100px; width: 100%;" class="partner-logo">
+          <span class="partner-name">Marriott</span>
+        </div>
+        <div class="partner-box">
+          <img src="https://tse1.mm.bing.net/th/id/OIP.A0WTFmOmxqnty1zjEdWeowHaEK?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Hilton" style ="height: 100px; width: 100%;" class="partner-logo">
+          <span class="partner-name">Hilton</span>
+        </div>
+        <div class="partner-box">
+          <img src="https://www.equitybulls.com/equitybullsadmin/uploads/Thomas%20Cook%20India%20Limited%20-%20New%20Logo%2044.jpg" alt="Thomas Cook" style ="height: 100px; width: 100%;" class="partner-logo">
+          <span class="partner-name">Thomas Cook</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Final CTA -->
+<section style="margin-bottom: -80px; position: relative; z-index: 2;">
+  <div class="container">
+    <div class="glass" style="background:var(--ac); padding:80px; border-radius:var(--r); text-align:center; box-shadow:var(--sh-lg);">
+      <h2 class="display" style="color:white; margin-bottom:16px;">The road is calling.</h2>
+      <p style="color:rgba(255,255,255,0.7); font-size:18px; margin-bottom:32px;">Join 120,000+ travellers who have seen the world with Voyara.</p>
+      <div class="flex gap-16" style="justify-content:center;">
+        <a href="packages.html" class="btn btn-lg" style="background:var(--gold); color:white;">Start Your Journey</a>
+        <a href="search.html" class="btn btn-lg" style="border:1px solid rgba(255,255,255,0.3); color:white;">Search Destinations</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">Voy<span>ara</span></div>
+        <p class="footer-desc">Crafting unforgettable travel experiences since 2018. Your journey, our passion.</p>
+      </div>
+      <div class="footer-col">
+        <h5>EXPLORE</h5>
+        <ul>
+          <li><a href="destinations.html">Destinations</a></li>
+          <li><a href="packages.html">Packages</a></li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>COMPANY</h5>
+        <ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>SUPPORT</h5>
+        <ul>
+          <li><a href="help-center.html">Help Center</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Voyara Luxury Travel. All rights reserved.</p>
+      <div class="flex gap-16">
+        <a href="#">Instagram</a>
+        <a href="#">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

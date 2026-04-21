@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us — Voyara Travel</title>
+<meta name="description" content="Get in touch with Voyara. We're available 24/7 to help you plan the perfect trip. Reach us by phone, email, or visit one of our offices.">
+<link rel="stylesheet" href="style.css">
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<style>
+/* ── Hero ── */
+.contact-hero {
+  background: var(--text);
+  position: relative;
+  overflow: hidden;
+  padding: 80px 0 0;
+}
+.contact-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('https://images.unsplash.com/photo-1423592707957-3b212afa6733?w=1400&q=60') center/cover;
+  opacity: 0.18;
+}
+.contact-hero > * { position: relative; }
+.contact-hero-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: end;
+}
+.contact-hero-text h1 {
+  font-family: var(--fd);
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  color: #fff;
+  margin-bottom: 16px;
+}
+.contact-hero-text .lead { color: rgba(255,255,255,0.65); margin-bottom: 36px; }
+.contact-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 56px;
+}
+.cstrip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  color: rgba(255,255,255,0.85);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.cstrip-icon {
+  width: 44px; height: 44px;
+  border-radius: var(--r);
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  backdrop-filter: blur(6px);
+}
+.cstrip-item strong { color: #fff; display: block; margin-bottom: 2px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+.contact-hero-form {
+  background: var(--white);
+  border-radius: var(--r) var(--r) 0 0;
+  padding: 36px 40px 40px;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.25);
+}
+.contact-hero-form h2 {
+  font-family: var(--fd);
+  font-size: 1.6rem;
+  margin-bottom: 6px;
+}
+.contact-hero-form .sub { font-size: 14px; color: var(--ts); margin-bottom: 28px; }
+
+/* ── Form Grid ── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-input-wrap { position: relative; }
+.form-input-wrap .form-control { padding-left: 42px; }
+.form-input-wrap .fi-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 15px; color: var(--muted); pointer-events: none;
+}
+.form-input-wrap.textarea .fi-icon { top: 14px; transform: none; }
+select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a09d97' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+/* ── Success message ── */
+.form-success {
+  display: none;
+  text-align: center;
+  padding: 40px 20px;
+  animation: fadeUp .4s ease both;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.form-success .fs-icon { font-size: 52px; margin-bottom: 16px; }
+.form-success h3 { font-family: var(--fd); font-size: 1.6rem; margin-bottom: 8px; }
+.form-success p { color: var(--ts); font-size: 15px; }
+
+/* ── Info cards ── */
+.info-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 56px 0;
+}
+.info-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 32px 28px;
+  text-align: center;
+  transition: box-shadow .2s, transform .2s;
+}
+.info-card:hover { box-shadow: var(--sh); transform: translateY(-3px); }
+.info-icon {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: var(--acl);
+  color: var(--ac);
+  font-size: 24px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 18px;
+}
+.info-card h3 { font-family: var(--fd); font-size: 1.2rem; margin-bottom: 8px; }
+.info-card p { font-size: 14px; color: var(--ts); line-height: 1.7; margin-bottom: 14px; }
+.info-card a { color: var(--ac); font-size: 14px; font-weight: 500; transition: color .15s; }
+.info-card a:hover { color: var(--ach); }
+
+/* ── Office map section ── */
+.offices-section { background: var(--off); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 72px 0; }
+.offices-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+.office-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  transition: box-shadow .2s;
+}
+.office-card:hover { box-shadow: var(--sh); }
+.office-img { height: 180px; background: var(--light); overflow: hidden; }
+.office-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+.office-card:hover .office-img img { transform: scale(1.05); }
+.office-body { padding: 22px 24px; }
+.office-city { font-family: var(--fd); font-size: 1.2rem; margin-bottom: 10px; }
+.office-detail { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--ts); margin-bottom: 8px; line-height: 1.6; }
+.office-detail-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── FAQ teaser ── */
+.faq-teaser { padding: 72px 0; }
+.faq-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+.faq-list { margin-top: 32px; }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-q {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 0;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  gap: 16px;
+  user-select: none;
+  transition: color .15s;
+}
+.faq-q:hover { color: var(--ac); }
+.faq-chevron { font-size: 18px; transition: transform .25s; flex-shrink: 0; color: var(--muted); }
+.faq-item.open .faq-chevron { transform: rotate(180deg); color: var(--ac); }
+.faq-item.open .faq-q { color: var(--ac); }
+.faq-a { font-size: 14px; color: var(--ts); line-height: 1.8; padding-bottom: 18px; display: none; }
+.faq-item.open .faq-a { display: block; }
+
+/* ── Social / live chat ── */
+.social-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+.social-btn {
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--rs);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  text-decoration: none;
+  transition: all .15s;
+  cursor: pointer;
+  background: var(--white);
+}
+.social-btn:hover { border-color: var(--ac); color: var(--ac); background: var(--acl); }
+
+/* ── Availability badge ── */
+.available-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--acl); color: var(--ac);
+  font-size: 12px; font-weight: 600; padding: 5px 12px;
+  border-radius: 100px; margin-bottom: 20px;
+}
+.pulse-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--ac);
+  animation: pulse 1.5s ease infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+
+/* ── Responsive ── */
+@media(max-width: 900px) {
+  .contact-hero-inner { grid-template-columns: 1fr; }
+  .contact-strip { padding-bottom: 32px; }
+  .contact-hero-form { border-radius: 0; }
+  .form-row { grid-template-columns: 1fr; }
+  .info-strip { grid-template-columns: 1fr; }
+  .offices-grid { grid-template-columns: 1fr; }
+  .faq-inner { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="navbar-brand">Voy<span>ara</span></a>
+    <nav class="navbar-nav">
+      <a href="destinations.html">Destinations</a>
+      <a href="packages.html">Packages</a>
+      <a href="search.html">Search</a>
+      <a href="blog.html">Blog</a>
+      <a href="about.html">About</a>
+    </nav>
+    <div class="navbar-actions"></div><!-- populated by auth.js -->
+  </div>
+</nav>
+
+<!-- ── HERO + FORM ── -->
+<div class="contact-hero">
+  <div class="container">
+    <div class="contact-hero-inner">
+      <!-- Left: text + contact details -->
+      <div>
+        <div class="contact-hero-text">
+          <div class="available-badge"><span class="pulse-dot"></span> We're online right now</div>
+          <h1>Let's plan your next adventure together</h1>
+          <p class="lead">Our travel experts are available 24 hours a day, 7 days a week. No chatbots — real humans who love to travel.</p>
+        </div>
+        <div class="contact-strip">
+          <div class="cstrip-item">
+            <div class="cstrip-icon">📞</div>
+            <div>
+              <strong>Phone Support</strong>
+              +91 1800 572 8899 · Toll-free<br>
+              <span style="font-size:12px;opacity:.7;">Mon–Sun · 8 AM to 11 PM IST</span>
+            </div>
+          </div>
+          <div class="cstrip-item">
+            <div class="cstrip-icon">✉️</div>
+            <div>
+              <strong>Email Us</strong>
+              hello@voyara.in · support@voyara.in<br>
+              <span style="font-size:12px;opacity:.7;">Response within 2 hours</span>
+            </div>
+          </div>
+          <div class="cstrip-item">
+            <div class="cstrip-icon">💬</div>
+            <div>
+              <strong>Live Chat</strong>
+              Available on website & app<br>
+              <span style="font-size:12px;opacity:.7;">Average wait: under 3 minutes</span>
+            </div>
+          </div>
+          <div class="cstrip-item">
+            <div class="cstrip-icon">📍</div>
+            <div>
+              <strong>Head Office</strong>
+              12th Floor, One BKC, Bandra Kurla Complex, Mumbai — 400 051<br>
+              <span style="font-size:12px;opacity:.7;">Mon–Fri · 9 AM to 6 PM IST</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Contact form -->
+      <div class="contact-hero-form">
+        <div id="formView">
+          <h2>Send us a message</h2>
+          <p class="sub">Fill out the form and we'll get back to you within 2 hours.</p>
+          <div class="flex-col gap-16" style="display:flex;flex-direction:column;gap:16px;">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">First Name *</label>
+                <div class="form-input-wrap">
+                  <span class="fi-icon">👤</span>
+                  <input id="c-fname" type="text" class="form-control" placeholder="Priya" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name *</label>
+                <div class="form-input-wrap">
+                  <span class="fi-icon">👤</span>
+                  <input id="c-lname" type="text" class="form-control" placeholder="Sharma">
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Email Address *</label>
+                <div class="form-input-wrap">
+                  <span class="fi-icon">✉️</span>
+                  <input id="c-email" type="email" class="form-control" placeholder="priya@email.com" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <div class="form-input-wrap">
+                  <span class="fi-icon">📞</span>
+                  <input id="c-phone" type="tel" class="form-control" placeholder="+91 98765 43210">
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Subject *</label>
+              <div class="form-input-wrap">
+                <span class="fi-icon">📋</span>
+                <select id="c-subject" class="form-control">
+                  <option value="">Select a topic…</option>
+                  <option>New Booking Enquiry</option>
+                  <option>Existing Booking Support</option>
+                  <option>Cancellation / Refund</option>
+                  <option>Visa &amp; Documentation Help</option>
+                  <option>Custom / Group Tour</option>
+                  <option>Corporate Travel</option>
+                  <option>Feedback &amp; Complaints</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Your Message *</label>
+              <div class="form-input-wrap textarea">
+                <span class="fi-icon">💬</span>
+                <textarea id="c-msg" class="form-control" rows="4" style="padding-left:42px;resize:vertical;" placeholder="Tell us about your trip plans, questions, or anything we can help with…"></textarea>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="checkbox" id="c-newsletter" style="accent-color:var(--ac);">
+              <label for="c-newsletter" style="font-size:13px;color:var(--ts);cursor:pointer;">Subscribe to travel deals &amp; insider tips</label>
+            </div>
+            <div id="c-error" style="display:none;color:var(--danger);font-size:13px;padding:10px 14px;background:#fdf0ef;border-radius:var(--rs);"></div>
+            <button class="btn btn-primary btn-lg" id="c-submit-btn" onclick="submitContact()" style="width:100%;justify-content:center;">
+              Send Message →
+            </button>
+          </div>
+        </div>
+        <!-- Success state -->
+        <div class="form-success" id="formSuccess">
+          <div class="fs-icon">🎉</div>
+          <h3>Message received!</h3>
+          <p>Thanks for reaching out. One of our travel experts will reply to your email within 2 hours.</p>
+          <a href="packages.html" class="btn btn-outline" style="margin-top:20px;">Browse Packages</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── QUICK CONTACT INFO CARDS ── -->
+<section>
+  <div class="container">
+    <div class="info-strip">
+      <div class="info-card">
+        <div class="info-icon">🕐</div>
+        <h3>Response Time</h3>
+        <p>Email replies within 2 hours during business hours. Live chat under 3 minutes around the clock.</p>
+        <a href="help-center.html">Visit Help Centre →</a>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">🌍</div>
+        <h3>International Support</h3>
+        <p>Calling from abroad? Use our international number: <strong>+91 22 6889 5500</strong></p>
+        <a href="tel:+912268895500">Call Now →</a>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">💼</div>
+        <h3>Corporate &amp; Groups</h3>
+        <p>Planning a company retreat or group trip of 10+? Our dedicated B2B desk will tailor the best deal.</p>
+        <a href="mailto:corporate@voyara.in">corporate@voyara.in →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── OFFICE LOCATIONS ── -->
+<section class="offices-section">
+  <div class="container">
+    <div class="text-center">
+      <div class="section-label">Our Offices</div>
+      <h2>Find us near you</h2>
+      <p style="color:var(--ts);margin-top:10px;font-size:15px;">Walk in, call ahead, or book a virtual consultation — we're always here.</p>
+    </div>
+    <div class="offices-grid">
+      <div class="office-card">
+        <div class="office-img">
+          <img src="https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=600&q=80" alt="Mumbai Office">
+        </div>
+        <div class="office-body">
+          <div class="office-city">Mumbai — Head Office</div>
+          <div class="office-detail"><span class="office-detail-icon">📍</span>12th Floor, One BKC, Bandra Kurla Complex, Mumbai 400051</div>
+          <div class="office-detail"><span class="office-detail-icon">📞</span>+91 22 6889 5500</div>
+          <div class="office-detail"><span class="office-detail-icon">🕐</span>Mon – Fri · 9 AM – 6 PM</div>
+        </div>
+      </div>
+      <div class="office-card">
+        <div class="office-img">
+          <img src="https://images.unsplash.com/photo-1587474260584-136574528ed5?w=600&q=80" alt="Delhi Office">
+        </div>
+        <div class="office-body">
+          <div class="office-city">New Delhi</div>
+          <div class="office-detail"><span class="office-detail-icon">📍</span>Unit 4A, Connaught Place, New Delhi 110001</div>
+          <div class="office-detail"><span class="office-detail-icon">📞</span>+91 11 4055 2200</div>
+          <div class="office-detail"><span class="office-detail-icon">🕐</span>Mon – Sat · 9 AM – 7 PM</div>
+        </div>
+      </div>
+      <div class="office-card">
+        <div class="office-img">
+          <img src="https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=600&q=80" alt="Bangalore Office">
+        </div>
+        <div class="office-body">
+          <div class="office-city">Bengaluru</div>
+          <div class="office-detail"><span class="office-detail-icon">📍</span>WeWork, Salarpuria Magnificia, MG Road, Bengaluru 560001</div>
+          <div class="office-detail"><span class="office-detail-icon">📞</span>+91 80 4601 1100</div>
+          <div class="office-detail"><span class="office-detail-icon">🕐</span>Mon – Fri · 9 AM – 6 PM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ TEASER + SOCIAL ── -->
+<section class="faq-teaser">
+  <div class="container">
+    <div class="faq-inner">
+      <!-- FAQ -->
+      <div>
+        <div class="section-label">Quick Answers</div>
+        <h2>Frequently asked questions</h2>
+        <div class="faq-list" id="faqList">
+          <!-- items injected by JS -->
+        </div>
+        <a href="help-center.html" class="btn btn-outline" style="margin-top:28px;">View all FAQs →</a>
+      </div>
+
+      <!-- Connect channels -->
+      <div>
+        <div class="section-label">Connect With Us</div>
+        <h2>Other ways to reach us</h2>
+        <p style="margin-top:16px;font-size:15px;color:var(--ts);line-height:1.8;">Prefer social? DM us on any platform — our social team responds within 30 minutes during business hours.</p>
+        <div class="social-row">
+          <a class="social-btn" href="#"><span>𝕏</span> @VoyaraTravel</a>
+          <a class="social-btn" href="#"><span>📱</span> Instagram</a>
+          <a class="social-btn" href="#"><span>🤝</span> LinkedIn</a>
+          <a class="social-btn" href="#"><span>📘</span> Facebook</a>
+        </div>
+        <div style="margin-top:36px;padding:28px;background:var(--off);border:1px solid var(--border);border-radius:var(--r);">
+          <div style="font-family:var(--fd);font-size:1.2rem;margin-bottom:10px;">Need emergency travel support?</div>
+          <p style="font-size:14px;color:var(--ts);margin-bottom:18px;line-height:1.7;">If you're currently on a trip and need urgent assistance — lost passport, missed connection, medical emergency — call our 24/7 emergency line immediately.</p>
+          <a href="tel:+911800572HELP" class="btn btn-primary">📞 Emergency Line: 1800-572-HELP</a>
+        </div>
+        <div style="margin-top:20px;padding:20px;background:var(--acl);border-radius:var(--r);display:flex;gap:14px;align-items:flex-start;">
+          <span style="font-size:24px;">💬</span>
+          <div>
+            <div style="font-weight:600;margin-bottom:4px;color:var(--ach);">Live Chat Available Now</div>
+            <div style="font-size:14px;color:var(--ts);margin-bottom:12px;">Average wait time: under 3 minutes</div>
+            <button class="btn btn-primary btn-sm" onclick="alert('Live Chat would open here in production.')">Start Live Chat</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">Voy<span>ara</span></div>
+        <p class="footer-desc">Crafting unforgettable travel experiences since 2018. Your journey, our passion.</p>
+      </div>
+      <div>
+        <p class="footer-col"><h5>Explore</h5><ul><li><a href="destinations.html">Destinations</a></li><li><a href="packages.html">Packages</a></li><li><a href="search.html">Search</a></li><li><a href="blog.html">Blog</a></li></ul></p>
+      </div>
+      <div>
+        <p class="footer-col"><h5>Company</h5><ul><li><a href="about.html">About Us</a></li><li><a href="#">Careers</a></li><li><a href="#">Press</a></li></ul></p>
+      </div>
+      <div>
+        <p class="footer-col"><h5>Support</h5><ul><li><a href="help-center.html">Help Centre</a></li><li><a href="contact.html" style="color:var(--ac);font-weight:500;">Contact Us</a></li><li><a href="#">Terms</a></li><li><a href="#">Privacy</a></li></ul></p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Voyara Travel Pvt. Ltd. All rights reserved.</p>
+      <span>IATA Accredited · ATOL Protected</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Contact Form Submission ────────────────────────────────────────────────
+async function submitContact() {
+  const fname   = document.getElementById('c-fname').value.trim();
+  const email   = document.getElementById('c-email').value.trim();
+  const subject = document.getElementById('c-subject').value;
+  const msg     = document.getElementById('c-msg').value.trim();
+  const errEl   = document.getElementById('c-error');
+  const btn     = document.getElementById('c-submit-btn');
+
+  errEl.style.display = 'none';
+
+  if (!fname || !email || !subject || !msg) {
+    errEl.textContent = 'Please fill out all required fields (*) before submitting.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errEl.textContent = 'Please enter a valid email address.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  // Simulate network delay (in production this hits /api/contact)
+  await new Promise(r => setTimeout(r, 1200));
+
+  document.getElementById('formView').style.display = 'none';
+  document.getElementById('formSuccess').style.display = 'block';
+}
+
+// ── FAQ Accordion ─────────────────────────────────────────────────────────
+const FAQS = [
+  { q: 'How far in advance should I book a trip?', a: 'We recommend booking at least 6–8 weeks in advance for international trips and 2–3 weeks for domestic. Popular departures (especially during school holidays and Diwali) sell out much earlier.' },
+  { q: 'Can I customise a package to suit my budget?', a: 'Absolutely. Every package on Voyara can be tailored — hotel category, activities, number of nights, meal plans — just drop us a message and our experts will build a custom quote within 4 hours.' },
+  { q: 'What payment methods do you accept?', a: 'We accept all major cards (Visa, Mastercard, Amex), UPI, net banking, and EMI options via leading banks. International bookings can also be paid in USD or EUR.' },
+  { q: 'What is your cancellation policy?', a: 'Free cancellation up to 30 days before departure for most packages. Between 15–30 days a 25% fee applies; under 15 days 50%. Full details are listed on each package page.' },
+];
+
+const faqList = document.getElementById('faqList');
+FAQS.forEach((f, i) => {
+  const item = document.createElement('div');
+  item.className = 'faq-item';
+  item.innerHTML = `
+    <div class="faq-q" onclick="toggleFAQ(${i})">
+      <span>${f.q}</span>
+      <span class="faq-chevron">⌄</span>
+    </div>
+    <div class="faq-a">${f.a}</div>`;
+  faqList.appendChild(item);
+});
+
+function toggleFAQ(i) {
+  const items = document.querySelectorAll('.faq-item');
+  items.forEach((item, idx) => {
+    if (idx === i) item.classList.toggle('open');
+    else item.classList.remove('open');
+  });
+}
+</script>
+</body>
+</html>

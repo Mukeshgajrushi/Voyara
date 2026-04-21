@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Complete Guide to Santorini — Voyara Blog</title>
+<link rel="stylesheet" href="style.css">
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<style>
+.post-hero {
+  position: relative;
+  height: 520px;
+  overflow: hidden;
+}
+.post-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.post-hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 55%);
+  display: flex; align-items: flex-end;
+}
+.post-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 32px 48px;
+  width: 100%;
+}
+.post-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 56px;
+  align-items: start;
+}
+.post-body {
+  max-width: 720px;
+}
+.post-body h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  margin: 36px 0 14px;
+  line-height: 1.25;
+}
+.post-body h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  margin: 28px 0 10px;
+}
+.post-body p {
+  font-size: 16px;
+  color: var(--gray-800);
+  line-height: 1.85;
+  margin-bottom: 18px;
+}
+.post-body ul, .post-body ol {
+  margin: 0 0 18px 22px;
+  color: var(--gray-800);
+  font-size: 16px;
+  line-height: 1.85;
+}
+.post-body li { margin-bottom: 6px; }
+.post-body a { color: var(--black); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+.post-body blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 28px 0;
+  padding: 16px 24px;
+  background: var(--accent-light);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+.post-body blockquote p {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--accent-dark);
+  margin-bottom: 0;
+  font-style: italic;
+  line-height: 1.6;
+}
+.post-img-full {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  display: block;
+  margin: 28px 0;
+}
+.post-img-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 28px 0;
+}
+.post-img-2col img {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  display: block;
+}
+.tip-box {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin: 28px 0;
+}
+.tip-box-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.tip-box-icon { font-size: 18px; }
+.tip-box-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gray-400); }
+.tip-box p { font-size: 14px; color: var(--gray-600); margin-bottom: 0; line-height: 1.65; }
+.info-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+.info-table td { padding: 11px 14px; border-bottom: 1px solid var(--gray-100); vertical-align: top; }
+.info-table td:first-child { font-weight: 600; color: var(--gray-800); width: 40%; }
+.info-table td:last-child { color: var(--gray-600); }
+.info-table tr:last-child td { border-bottom: none; }
+/* Sidebar */
+.post-sidebar { position: sticky; top: calc(var(--nav-h) + 20px); }
+.toc { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; }
+.toc-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray-400); margin-bottom: 14px; }
+.toc-link { display: block; font-size: 13px; color: var(--gray-600); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--gray-200); transition: color 0.15s; }
+.toc-link:last-child { border-bottom: none; }
+.toc-link:hover { color: var(--black); }
+.related-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 12px; display: flex; gap: 12px; padding: 12px; transition: all 0.2s; text-decoration: none; color: var(--black); }
+.related-card:hover { box-shadow: var(--shadow-sm); }
+.related-thumb { width: 64px; height: 54px; border-radius: var(--radius-sm); object-fit: cover; background: var(--gray-200); flex-shrink: 0; }
+.related-card-title { font-size: 13px; font-weight: 500; line-height: 1.35; margin-bottom: 3px; }
+.related-card-meta { font-size: 11px; color: var(--gray-400); }
+.author-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 18px; margin-bottom: 20px; }
+.share-btns { display: flex; gap: 8px; margin-top: 12px; }
+.share-btn { flex: 1; padding: 9px; border-radius: var(--radius-md); border: 1.5px solid var(--gray-200); background: var(--white); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; text-align: center; font-family: var(--font-body); color: var(--gray-600); }
+.share-btn:hover { border-color: var(--black); color: var(--black); background: var(--gray-50); }
+/* Progress bar */
+.reading-progress {
+  position: fixed; top: 0; left: 0;
+  height: 3px; background: var(--accent);
+  transition: width 0.1s;
+  z-index: 9999;
+}
+</style>
+</head>
+<body>
+
+<div class="reading-progress" id="progress"></div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Voy<span>ara</span></a>
+    <ul class="nav-links">
+      <li><a href="destinations.html">Destinations</a></li>
+      <li><a href="packages.html">Packages</a></li>
+      <li><a href="search.html">Explore</a></li>
+      <li><a href="blog.html" class="active">Blog</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+      <a href="booking.html" class="btn btn-primary btn-sm">Book Now</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="post-hero">
+  <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1400&q=80" alt="Santorini">
+  <div class="post-hero-overlay">
+    <div class="post-hero-content">
+      <div class="breadcrumb" style="margin-bottom:12px;">
+        <a href="blog.html" style="color:rgba(255,255,255,0.6);text-decoration:none;">Blog</a>
+        <span style="color:rgba(255,255,255,0.3);">›</span>
+        <span style="color:rgba(255,255,255,0.6);">Travel Guides</span>
+      </div>
+      <span class="badge badge-accent" style="margin-bottom:14px;">Travel Guide</span>
+      <h1 style="font-family:var(--font-display);font-size:clamp(26px,4vw,40px);font-weight:700;color:white;line-height:1.15;margin-bottom:14px;">The Complete Guide to Santorini:<br>Best Times, Places & Hidden Gems</h1>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:12px;">AV</div>
+          <span style="color:rgba(255,255,255,0.85);font-size:13px;">Anika Verma</span>
+        </div>
+        <span style="color:rgba(255,255,255,0.4);">·</span>
+        <span style="color:rgba(255,255,255,0.65);font-size:13px;">June 12, 2025</span>
+        <span style="color:rgba(255,255,255,0.4);">·</span>
+        <span style="color:rgba(255,255,255,0.65);font-size:13px;">8 min read</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="container section">
+    <div class="post-layout">
+
+      <!-- Article Body -->
+      <article class="post-body" id="article">
+
+        <p style="font-size:18px;color:var(--gray-600);font-style:italic;border-left:3px solid var(--gray-200);padding-left:20px;margin-bottom:28px;line-height:1.7;">If Greece is a painting, Santorini is its signature — bold, unmistakable, and impossible to forget. After four visits over six years, I'm convinced it belongs on every traveller's list at least once.</p>
+
+        <h2>Why Santorini is unlike anywhere else</h2>
+        <p>Santorini didn't always look the way it does today. Around 1600 BCE, one of the largest volcanic eruptions in recorded human history hollowed out the centre of the island, leaving a crescent of cliffs surrounding a flooded caldera. The whitewashed villages that now cling to those cliffs — built centuries later — are essentially perched on the rim of an ancient supervolcano.</p>
+        <p>That geological drama is what makes the views so impossibly cinematic. From Oia or Imerovigli, you're not looking at a shoreline — you're looking down into the earth, at water 400 metres below sea level, ringed by cliffs that glow golden in the sunset.</p>
+
+        <blockquote><p>"The first time I saw Oia at sunset, I genuinely didn't believe it was real. I thought someone had applied a filter to the sky."</p></blockquote>
+
+        <h2>When to go</h2>
+        <p>Santorini is at its most magical in the shoulder seasons. Here's a quick breakdown:</p>
+        <table class="info-table" style="background:var(--gray-50);border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--gray-200);">
+          <tr><td>April – June</td><td>Warm days, uncrowded, wildflowers in bloom. Best overall time.</td></tr>
+          <tr><td>July – August</td><td>Peak season. Hot, busy, and expensive — but the Aegean is warmest for swimming.</td></tr>
+          <tr><td>September – October</td><td>Our personal favourite. Crowds thin out but the weather stays warm.</td></tr>
+          <tr><td>November – March</td><td>Most businesses close. Atmospheric but limited access.</td></tr>
+        </table>
+
+        <h2>Where to stay</h2>
+        <p>Where you stay in Santorini matters more than almost anywhere else in the world — because the views are the experience. The three main areas each offer a different version of the island.</p>
+
+        <img src="https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80" class="post-img-full" alt="Oia village">
+
+        <h3>Oia (Ία)</h3>
+        <p>The most famous village on the island, and for good reason. Oia has the most Instagram-famous windmills, the best sunset viewing spots, and the most boutique hotels. It's also the most expensive and the most crowded. Book at least 6 months in advance for caldera-view hotels in summer.</p>
+
+        <h3>Fira (Φηρά)</h3>
+        <p>The capital is busier and more commercial than Oia, but it's more central and slightly more affordable. It's also the hub for ferry connections and ATV rentals. The cliff-edge restaurant row has stunning caldera views.</p>
+
+        <h3>Imerovigli</h3>
+        <p>Perched higher than any other village on the caldera rim, Imerovigli offers arguably the best 360° views in Santorini. Quieter than Oia, more local in character, and only a 30-minute walk between the two villages.</p>
+
+        <div class="tip-box">
+          <div class="tip-box-header"><span class="tip-box-icon">💡</span><span class="tip-box-title">Insider Tip</span></div>
+          <p>Book a caldera-view hotel even if it's beyond your normal budget. You'll spend more time on that terrace than anywhere else on the island. The view from your private plunge pool at 6 AM, with the caldera below you and no other tourists in sight, is the single best thing about Santorini.</p>
+        </div>
+
+        <h2>What to do</h2>
+        <p>Beyond the famous sunset, Santorini has more to offer than most people realise.</p>
+
+        <div class="post-img-2col">
+          <img src="https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?w=600&q=80" alt="Caldera view">
+          <img src="https://images.unsplash.com/photo-1555993539-1732b0258235?w=600&q=80" alt="Black sand beach">
+        </div>
+
+        <h3>The Caldera Cruise</h3>
+        <p>A sailing trip around the caldera is a non-negotiable. Most tours stop at the volcanic hot springs (where the water runs red-orange from the iron deposits), the active volcano at Nea Kameni, and then finish with a sunset view from the water looking back at the cliff towns. Book a private catamaran for a group if possible — far better than a large party boat.</p>
+
+        <h3>Perissa & Perivolos Beaches</h3>
+        <p>The black volcanic sand beaches on the south side of the island are genuinely dramatic. The sand is dark grey-black, the water is crystal clear, and the volcanic cliff of Mesa Vouno towers above you. It's as un-Mediterranean as you can get while still being in Greece.</p>
+
+        <h3>Wine Tasting</h3>
+        <p>Santorini's volcanic soil produces a truly unique white wine called Assyrtiko — dry, mineral, and citrus-forward. The vines grow in a distinctive basket shape (called a kouloura) to protect them from the wind. Visit Santo Wines for the view, Domaine Sigalas for the best wine.</p>
+
+        <h2>Practical information</h2>
+        <table class="info-table" style="background:var(--gray-50);border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--gray-200);">
+          <tr><td>Getting there</td><td>Direct flights Athens → Santorini (45 min). Or ferry from Athens Piraeus port (5–8 hours, scenic but long).</td></tr>
+          <tr><td>Getting around</td><td>Rent an ATV (easiest), hire a driver, or use the KTEL buses (cheap but infrequent).</td></tr>
+          <tr><td>Visa (India)</td><td>Schengen Tourist Visa required. Apply 4–6 weeks in advance. €80 fee.</td></tr>
+          <tr><td>Currency</td><td>Euro (€). Most places accept cards; keep some cash for smaller cafes.</td></tr>
+          <tr><td>Language</td><td>Greek, but English is universally spoken in tourist areas.</td></tr>
+          <tr><td>Budget</td><td>₹8,000–₹25,000 per day depending on accommodation tier.</td></tr>
+        </table>
+
+        <div class="tip-box" style="background:var(--accent-light);border-color:var(--accent);">
+          <div class="tip-box-header"><span class="tip-box-icon">✦</span><span class="tip-box-title" style="color:var(--accent-dark);">Ready to Book?</span></div>
+          <p style="color:var(--accent-dark);">Our Santorini Sunset Escape package includes 6 nights in a caldera-view villa, private sunset cruise, wine tasting tour, and all meals — starting from ₹1,24,000 per person.</p>
+          <a href="booking.html" class="btn btn-accent mt-12 btn-sm">View Santorini Package →</a>
+        </div>
+
+        <h2>Final thoughts</h2>
+        <p>Santorini can feel like it's been taken over by Instagram — and in peak summer, it has been. But there are quiet versions of this island: a 6 AM walk through Oia before the tour groups arrive, a midweek boat trip in September, a table at a cliffside taverna on a Tuesday night with a carafe of Assyrtiko and the caldera slowly going gold.</p>
+        <p>That Santorini is still very much there. You just have to time it right.</p>
+
+        <!-- Author Bio -->
+        <div style="border-top:1px solid var(--gray-200);margin-top:48px;padding-top:32px;display:flex;gap:16px;align-items:flex-start;">
+          <div style="width:52px;height:52px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--accent-dark);flex-shrink:0;">AV</div>
+          <div>
+            <h3 class="heading-3 mb-4">Anika Verma</h3>
+            <p style="font-size:13px;color:var(--gray-400);margin-bottom:6px;">Co-founder & CEO · 40 countries visited · Santorini 4× times</p>
+            <p style="font-size:14px;color:var(--gray-600);">Former McKinsey consultant turned travel entrepreneur. Believes every good trip starts with the right hotel room view.</p>
+          </div>
+        </div>
+
+      </article>
+
+      <!-- Sidebar -->
+      <aside class="post-sidebar">
+
+        <div class="toc">
+          <p class="toc-title">In this article</p>
+          <a href="#" class="toc-link">Why Santorini is unique</a>
+          <a href="#" class="toc-link">When to go</a>
+          <a href="#" class="toc-link">Where to stay</a>
+          <a href="#" class="toc-link">What to do</a>
+          <a href="#" class="toc-link">Practical info</a>
+          <a href="#" class="toc-link">Final thoughts</a>
+        </div>
+
+        <div class="author-card">
+          <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--gray-400);margin-bottom:10px;">Share this article</p>
+          <div class="share-btns">
+            <button class="share-btn" onclick="alert('Shared on WhatsApp!')">WhatsApp</button>
+            <button class="share-btn" onclick="navigator.clipboard.writeText(location.href);alert('Link copied!')">Copy link</button>
+          </div>
+        </div>
+
+        <div style="background:var(--black);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;">
+          <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);margin-bottom:10px;">Book Santorini</p>
+          <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=300&q=80" style="width:100%;border-radius:var(--radius-md);height:100px;object-fit:cover;margin-bottom:12px;">
+          <p style="color:rgba(255,255,255,0.85);font-size:13px;margin-bottom:12px;">6 nights · Caldera villa · All meals · Sunset cruise</p>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:white;margin-bottom:12px;">₹1,24,000 <span style="font-size:13px;font-weight:400;color:rgba(255,255,255,0.5);">/ person</span></div>
+          <a href="booking.html" class="btn btn-accent w-full btn-sm">Book Now →</a>
+        </div>
+
+        <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--gray-400);margin-bottom:12px;">Related Articles</p>
+        <a href="blog-post.html" class="related-card">
+          <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=200&q=80" class="related-thumb" alt="Japan">
+          <div><div class="related-card-title">Japan on ₹5,000/day: Our Honest Guide</div><div class="related-card-meta">Rohan Joshi · 6 min read</div></div>
+        </a>
+        <a href="blog-post.html" class="related-card">
+          <img src="https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=200&q=80" class="related-thumb" alt="Maldives">
+          <div><div class="related-card-title">Maldives vs Bali for Honeymoon</div><div class="related-card-meta">Sneha M. · 6 min read</div></div>
+        </a>
+        <a href="blog-post.html" class="related-card">
+          <img src="https://images.unsplash.com/photo-1488085061387-422e29b40080?w=200&q=80" class="related-thumb" alt="Packing">
+          <div><div class="related-card-title">The Ultimate Carry-On Packing List</div><div class="related-card-meta">Meera V. · 5 min read</div></div>
+        </a>
+
+      </aside>
+
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><div class="footer-logo">Voy<span>ara</span></div><p class="footer-desc">Crafting unforgettable travel experiences since 2018.</p></div>
+      <div><p class="footer-heading">Explore</p><ul class="footer-links"><li><a href="destinations.html">Destinations</a></li><li><a href="packages.html">Packages</a></li><li><a href="blog.html">Blog</a></li></ul></div>
+      <div><p class="footer-heading">Company</p><ul class="footer-links"><li><a href="about.html">About</a></li></ul></div>
+      <div><p class="footer-heading">Support</p><ul class="footer-links"><li><a href="help-center.html">Help</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p class="footer-copy">© 2025 Voyara. All rights reserved.</p></div>
+  </div>
+</footer>
+
+<script>
+window.addEventListener('scroll', () => {
+  const art = document.getElementById('article');
+  const artTop = art.offsetTop;
+  const artH = art.offsetHeight;
+  const scrolled = window.scrollY - artTop;
+  const pct = Math.min(Math.max(scrolled / artH * 100, 0), 100);
+  document.getElementById('progress').style.width = pct + '%';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — Voyara</title>
+<link rel="stylesheet" href="style.css">
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<style>
+.blog-hero{background:var(--text);color:var(--white);padding:80px 0;position:relative;overflow:hidden}
+.blog-hero::before{content:'';position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1400&q=60') center/cover;opacity:.3}
+.blog-hero>*{position:relative}
+.blog-featured{display:grid;grid-template-columns:3fr 2fr;gap:24px;margin-bottom:60px}
+.blog-featured-main{position:relative;border-radius:var(--r);overflow:hidden;cursor:pointer}
+.blog-featured-main img{width:100%;height:480px;object-fit:cover;display:block;transition:transform .4s}
+.blog-featured-main:hover img{transform:scale(1.03)}
+.blog-featured-main .overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.82) 0%,rgba(0,0,0,.1) 60%);display:flex;align-items:flex-end;padding:32px}
+.blog-featured-side{display:flex;flex-direction:column;gap:20px}
+.blog-side-card{position:relative;border-radius:var(--r);overflow:hidden;cursor:pointer;flex:1}
+.blog-side-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s;min-height:140px}
+.blog-side-card:hover img{transform:scale(1.04)}
+.blog-side-card .overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,rgba(0,0,0,.05) 60%);display:flex;align-items:flex-end;padding:18px}
+.overlay-content h3{color:white;font-family:var(--fd);line-height:1.3;margin-bottom:6px}
+.overlay-content p{color:rgba(255,255,255,.75);font-size:12px}
+.article-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:all .25s;cursor:pointer}
+.article-card:hover{box-shadow:var(--sh);transform:translateY(-3px)}
+.article-img{width:100%;height:190px;object-fit:cover;display:block;background:var(--light)}
+.article-body{padding:20px 22px}
+.article-tag{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--ac);margin-bottom:8px}
+.article-title{font-family:var(--fd);font-size:17px;line-height:1.35;margin-bottom:8px}
+.article-excerpt{font-size:13px;color:var(--ts);line-height:1.6;margin-bottom:14px}
+.article-meta{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.cat-pill{padding:5px 14px;border-radius:100px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;border:1.5px solid var(--border);background:var(--white);color:var(--ts);font-family:var(--fb)}
+.cat-pill.active,.cat-pill:hover{background:var(--text);color:var(--white);border-color:var(--text)}
+.newsletter-band{background:var(--acl);border-top:1px solid #b7dac8;border-bottom:1px solid #b7dac8;padding:48px 0;text-align:center}
+.community-badge{position:absolute;top:10px;left:10px;background:var(--ac);color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;text-transform:uppercase;letter-spacing:.06em}
+@media(max-width:900px){.blog-featured{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="navbar-brand">Voy<span>ara</span></a>
+    <nav class="navbar-nav">
+      <a href="destinations.html">Destinations</a>
+      <a href="packages.html">Packages</a>
+      <a href="search.html">Search</a>
+      <a href="blog.html" class="active">Blog</a>
+      <a href="about.html">About</a>
+    </nav>
+    <div class="navbar-actions"></div><!-- populated by auth.js -->
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="blog-hero">
+  <div class="container text-center">
+    <div class="section-label" style="justify-content:center;color:rgba(255,255,255,.5);margin-bottom:14px;">Stories &amp; Guides</div>
+    <h1 style="color:#fff;margin-bottom:16px;">The Voyara Journal</h1>
+    <p style="color:rgba(255,255,255,.65);font-size:17px;max-width:480px;margin:0 auto;">Travel guides, destination stories, packing tips, and insider advice from our community of explorers.</p>
+  </div>
+</div>
+
+<main>
+  <div class="container section">
+
+    <!-- Category Filter -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px;">
+      <button class="cat-pill active" onclick="filterCat('all',this)">All Posts</button>
+      <button class="cat-pill" onclick="filterCat('guides',this)">Travel Guides</button>
+      <button class="cat-pill" onclick="filterCat('tips',this)">Packing Tips</button>
+      <button class="cat-pill" onclick="filterCat('food',this)">Food &amp; Culture</button>
+      <button class="cat-pill" onclick="filterCat('budget',this)">Budget Travel</button>
+      <button class="cat-pill" onclick="filterCat('honeymoon',this)">Honeymoon</button>
+      <button class="cat-pill" onclick="filterCat('adventure',this)">Adventure</button>
+      <button class="cat-pill" id="pill-community" onclick="filterCat('community',this)">✏ Community</button>
+    </div>
+
+    <!-- Community blogs banner (shown only when user blogs exist) -->
+    <div id="community-banner" style="display:none;background:var(--acl);border:1px solid #b7dac8;border-radius:var(--r);padding:16px 20px;margin-bottom:24px;align-items:center;gap:12px;">
+      <span style="font-size:22px;">✏</span>
+      <div>
+        <div style="font-weight:600;font-size:14px;color:var(--ach);">Community Travel Stories</div>
+        <div style="font-size:13px;color:var(--ts);">Real stories written by Voyara travellers — <a href="my-trips.html?section=write" style="color:var(--ac);font-weight:500;">Write your own →</a></div>
+      </div>
+    </div>
+
+    <!-- User-written blogs injected here -->
+    <div id="community-grid" class="grid-3" style="margin-bottom:40px;"></div>
+
+    <!-- Featured -->
+    <div class="blog-featured">
+      <div class="blog-featured-main">
+        <img src="Santorini2.jpeg" alt="Santorini" onerror="this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=700&q=80'">
+        <div class="overlay">
+          <div class="overlay-content">
+            <span class="badge" style="background:var(--ac);color:#fff;margin-bottom:10px;">Travel Guide</span>
+            <h2 style="color:white;font-family:var(--fd);font-size:26px;margin-bottom:8px;line-height:1.25;">The Complete Guide to Santorini: Best Times, Places &amp; Hidden Gems</h2>
+            <p style="color:rgba(255,255,255,.75);font-size:13px;">Anika Verma · 8 min read · June 12, 2025</p>
+          </div>
+        </div>
+      </div>
+      <div class="blog-featured-side">
+        <div class="blog-side-card">
+          <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=500&q=80" alt="Japan">
+          <div class="overlay">
+            <div class="overlay-content">
+              <span class="badge" style="margin-bottom:6px;font-size:10px;background:rgba(255,255,255,.15);color:#fff;">Food &amp; Culture</span>
+              <h3 style="font-size:15px;">Japan on ₹5000/day: Our Honest Guide</h3>
+              <p style="font-size:11px;">Rohan Joshi · 6 min read</p>
+            </div>
+          </div>
+        </div>
+        <div class="blog-side-card">
+          <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=500&q=80" alt="Bali">
+          <div class="overlay">
+            <div class="overlay-content">
+              <span class="badge" style="margin-bottom:6px;font-size:10px;background:rgba(255,255,255,.15);color:#fff;">Adventure</span>
+              <h3 style="font-size:15px;">Bali's Best Treks: Ranked by Difficulty</h3>
+              <p style="font-size:11px;">Meera Pillai · 5 min read</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Articles Grid -->
+    <div>
+      <h2 style="font-family:var(--fd);font-size:1.8rem;margin-bottom:28px;">Latest Articles</h2>
+      <div class="grid-3" id="articles-grid">
+        <div class="article-card" data-cat="tips">
+          <img src="https://images.unsplash.com/photo-1488085061387-422e29b40080?w=500&q=80" class="article-img" alt="Packing">
+          <div class="article-body">
+            <p class="article-tag">Packing Tips</p>
+            <h3 class="article-title">The Ultimate Carry-On Packing List for a 10-Day Europe Trip</h3>
+            <p class="article-excerpt">Everything you need, nothing you don't. We tested 40 packing cubes so you don't have to.</p>
+            <div class="article-meta"><div style="width:24px;height:24px;border-radius:50%;background:var(--acl);color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">MV</div>Meera V. <span>·</span> 5 min read <span>·</span> May 28</div>
+          </div>
+        </div>
+        <div class="article-card" data-cat="budget">
+          <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80" class="article-img" alt="Goa Budget">
+          <div class="article-body">
+            <p class="article-tag">Budget Travel</p>
+            <h3 class="article-title">How to Do Goa for Under ₹8,000 Per Day (All-In)</h3>
+            <p class="article-excerpt">The best budget stays, cheapest scooter rentals, and where to eat like a local without blowing your budget.</p>
+            <div class="article-meta"><div style="width:24px;height:24px;border-radius:50%;background:#d0e8fa;color:#0c447c;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">RK</div>Rohan K. <span>·</span> 7 min read <span>·</span> May 14</div>
+          </div>
+        </div>
+        <div class="article-card" data-cat="honeymoon">
+          <img src="https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=500&q=80" class="article-img" alt="Maldives Honeymoon">
+          <div class="article-body">
+            <p class="article-tag">Honeymoon</p>
+            <h3 class="article-title">Maldives vs Bali for Honeymoon: An Honest Comparison</h3>
+            <p class="article-excerpt">Both are paradise. But they're not the same. Here's how to choose based on your personality, not just your budget.</p>
+            <div class="article-meta"><div style="width:24px;height:24px;border-radius:50%;background:#d0fae0;color:#1e6e3e;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">SM</div>Sneha M. <span>·</span> 6 min read <span>·</span> Apr 20</div>
+          </div>
+        </div>
+        <div class="article-card" data-cat="guides">
+          <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=500&q=80" class="article-img" alt="Dubai Guide">
+          <div class="article-body">
+            <p class="article-tag">Travel Guide</p>
+            <h3 class="article-title">Dubai in 4 Days: The Perfect Itinerary for First-Timers</h3>
+            <p class="article-excerpt">Burj Khalifa, desert safaris, souk shopping and where to find the best shawarma in the city.</p>
+            <div class="article-meta"><div style="width:24px;height:24px;border-radius:50%;background:#fae0d0;color:#9d5020;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">AP</div>Arjun P. <span>·</span> 8 min read <span>·</span> Apr 5</div>
+          </div>
+        </div>
+        <div class="article-card" data-cat="adventure">
+          <img src="skiing.jpeg" class="article-img" alt="Alps" onerror="this.src='https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=500&q=80'">
+          <div class="article-body">
+            <p class="article-tag">Adventure</p>
+            <h3 class="article-title">First Time Skiing in Switzerland: What Nobody Tells You</h3>
+            <p class="article-excerpt">Lessons learned, trails we loved, equipment we wished we'd rented differently, and why Zermatt beats Interlaken.</p>
+            <div class="article-meta"><div style="width:24px;height:24px;border-radius:50%;background:#e0d0fa;color:#3c3489;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">VR</div>Vikram R. <span>·</span> 9 min read <span>·</span> Mar 18</div>
+          </div>
+        </div>
+        <div class="article-card" data-cat="food">
+          <img src="https://images.unsplash.com/photo-1555993539-1732b0258235?w=500&q=80" class="article-img" alt="Japan Food">
+          <div class="article-body">
+            <p class="article-tag">Food &amp; Culture</p>
+            <h3 class="article-title">Eating Your Way Through Kyoto: A Street Food Diary</h3>
+            <p class="article-excerpt">From matcha soft serves at Fushimi Inari to midnight ramen in Nishiki — every bite worth writing about.</p>
+            <div class="article-meta"><div style="width:24px;height:24px;border-radius:50%;background:#faeeda;color:#633806;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">NK</div>Nisha K. <span>·</span> 6 min read <span>·</span> Mar 1</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:8px;margin-top:40px;">
+        <button class="btn btn-outline">← Prev</button>
+        <button class="btn btn-primary">1</button>
+        <button class="btn btn-outline">2</button>
+        <button class="btn btn-outline">3</button>
+        <button class="btn btn-outline">Next →</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Newsletter -->
+<div class="newsletter-band">
+  <div class="container">
+    <h2 style="font-family:var(--fd);font-size:1.8rem;margin-bottom:8px;">Get travel inspiration in your inbox</h2>
+    <p style="color:var(--ts);margin-bottom:24px;max-width:420px;margin-left:auto;margin-right:auto;">New guides, deals, and destination stories — every two weeks. No spam, ever.</p>
+    <div style="display:flex;gap:10px;max-width:440px;margin:0 auto;">
+      <input type="email" class="form-control" placeholder="your@email.com" style="flex:1;">
+      <button class="btn btn-primary">Subscribe</button>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:12px;">14,000+ readers · Unsubscribe anytime</p>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><div class="footer-brand">Voy<span>ara</span></div><p class="footer-desc">Crafting unforgettable travel experiences since 2018. Your journey, our passion.</p></div>
+      <div class="footer-col"><h5>Explore</h5><ul><li><a href="destinations.html">Destinations</a></li><li><a href="packages.html">Packages</a></li><li><a href="blog.html">Blog</a></li></ul></div>
+      <div class="footer-col"><h5>Company</h5><ul><li><a href="about.html">About Us</a></li><li><a href="#">Careers</a></li></ul></div>
+      <div class="footer-col"><h5>Support</h5><ul><li><a href="help-center.html">Help Centre</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2025 Voyara Travel</span><span>Privacy · Terms</span></div>
+  </div>
+</footer>
+
+<script>
+// ── Inject blogs from API ──────────────────────────────────────────────────
+async function loadBlogs() {
+  try {
+    const blogs = await fetchAPI('/blogs');
+    const grid   = document.getElementById('community-grid');
+    const banner = document.getElementById('community-banner');
+    if (!grid) return;
+    
+    // Filter out official vs community if needed, or just show all in community grid for now
+    const communityBlogs = blogs.filter(b => !b.isVerified || b.category === 'community');
+    
+    if (!communityBlogs.length) { 
+      grid.style.display = 'none'; 
+      if (banner) banner.style.display = 'none';
+      return; 
+    }
+
+    if (banner) banner.style.display = 'flex';
+    const catLabels = { guides:'Travel Guide', tips:'Packing Tips', food:'Food & Culture', budget:'Budget Travel', honeymoon:'Honeymoon', adventure:'Adventure', community: 'Community' };
+    
+    grid.innerHTML = communityBlogs.map(b => {
+      const dateStr = b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent';
+      return `
+      <div class="article-card" data-cat="${b.category}" data-community="1">
+        <div style="position:relative;">
+          <img src="${b.image}" class="article-img" alt="${b.title}" onerror="this.src='https://images.unsplash.com/photo-1488085061387-422e29b40080?w=500&q=80'">
+          <span class="community-badge">${b.isVerified ? 'Official' : 'Community'}</span>
+        </div>
+        <div class="article-body">
+          <p class="article-tag">${catLabels[b.category] || b.category} ${b.destination ? '· ' + b.destination : ''}</p>
+          <h3 class="article-title">${b.title}</h3>
+          <p class="article-excerpt">${b.excerpt || ''}</p>
+          <div class="article-meta">
+            <div style="width:24px;height:24px;border-radius:50%;background:var(--acl);color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${b.authorInitials || 'V'}</div>
+            ${b.author} <span>·</span> ${dateStr}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (error) {
+    console.error('Failed to load blogs:', error);
+  }
+}
+
+// ── Filter ─────────────────────────────────────────────────────────────────
+function filterCat(cat, el) {
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+
+  const staticCards = document.querySelectorAll('#articles-grid .article-card');
+  const commCards   = document.querySelectorAll('#community-grid .article-card');
+  const commGrid    = document.getElementById('community-grid');
+  const commBanner  = document.getElementById('community-banner');
+
+  if (cat === 'community') {
+    staticCards.forEach(c => c.style.display = 'none');
+    commCards.forEach(c => c.style.display = '');
+    commGrid.style.display = '';
+    if (commBanner && commCards.length) commBanner.style.display = 'flex';
+  } else if (cat === 'all') {
+    staticCards.forEach(c => c.style.display = '');
+    commCards.forEach(c => c.style.display = '');
+    commGrid.style.display = commCards.length ? '' : 'none';
+    if (commBanner) commBanner.style.display = commCards.length ? 'flex' : 'none';
+  } else {
+    staticCards.forEach(c => { c.style.display = c.dataset.cat === cat ? '' : 'none'; });
+    commCards.forEach(c => { c.style.display = c.dataset.cat === cat ? '' : 'none'; });
+    const anyComm = Array.from(commCards).some(c => c.style.display !== 'none');
+    commGrid.style.display   = anyComm ? '' : 'none';
+    if (commBanner) commBanner.style.display = anyComm ? 'flex' : 'none';
+  }
+}
+
+loadBlogs();
+</script>
+</body>
+</html>

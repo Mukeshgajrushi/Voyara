@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Search — Voyara</title>
+<link rel="stylesheet" href="style.css">
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<style>
+.search-hero{background:var(--text);padding:48px 0}
+.search-hero h1{color:#fff;margin-bottom:8px}
+.search-hero p{color:rgba(255,255,255,.65);font-size:15px;margin-bottom:24px}
+.search-bar{display:flex;gap:0;background:var(--white);border-radius:var(--r);overflow:hidden;border:1px solid var(--border)}
+.sb-field{flex:1;display:flex;align-items:center;gap:10px;padding:14px 18px;border-right:1px solid var(--border)}
+.sb-field:last-of-type{border-right:none}
+.sb-icon{font-size:18px;flex-shrink:0}
+.sb-inner label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:2px}
+.sb-inner input,.sb-inner select{border:none;outline:none;font-size:14px;font-weight:500;color:var(--text);background:transparent;width:100%}
+.sb-btn{background:var(--ac);color:#fff;border:none;padding:0 28px;font-size:15px;font-weight:500;cursor:pointer;transition:background .15s;white-space:nowrap}
+.sb-btn:hover{background:var(--ach)}
+.search-layout{display:grid;grid-template-columns:260px 1fr;gap:28px;padding:40px 0}
+.filter-section+.filter-section{margin-top:20px}
+.filter-section-title{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.price-range{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ts)}
+.price-range input[type=range]{flex:1;accent-color:var(--ac)}
+.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.result-count{font-size:14px;color:var(--ts)}
+.sort-row{display:flex;align-items:center;gap:10px}
+.result-grid{display:flex;flex-direction:column;gap:16px}
+.result-card{display:grid;grid-template-columns:240px 1fr;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:box-shadow .2s}
+.result-card:hover{box-shadow:var(--sh)}
+.rc-img{overflow:hidden;background:var(--light)}
+.rc-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.result-card:hover .rc-img img{transform:scale(1.04)}
+.rc-body{padding:20px;display:flex;flex-direction:column}
+.rc-cat{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.rc-title{font-family:var(--fd);font-size:1.2rem;color:var(--text);margin-bottom:6px}
+.rc-desc{font-size:14px;color:var(--ts);line-height:1.6;margin-bottom:12px;flex:1}
+.rc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.rc-tag{font-size:12px;padding:3px 10px;border-radius:100px;background:var(--light);color:var(--ts)}
+.rc-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border)}
+.rc-price{font-family:var(--fd);font-size:1.4rem;color:var(--text)}.rc-price small{font-size:13px;font-weight:400;color:var(--ts)}
+.rc-rating{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--ts)}
+.no-results{text-align:center;padding:60px 20px;color:var(--ts)}
+@media(max-width:900px){.search-layout{grid-template-columns:1fr}.result-card{grid-template-columns:1fr}.rc-img{aspect-ratio:16/8}}
+@media(max-width:768px){.search-bar{flex-direction:column;border-radius:var(--r)}.sb-field{border-right:none;border-bottom:1px solid var(--border)}.sb-btn{padding:14px;border-radius:0}}
+</style>
+</head>
+<body>
+<nav class="navbar"><div class="container">
+  <a href="index.html" class="navbar-brand">Voy<span>ara</span></a>
+  <nav class="navbar-nav"><a href="destinations.html">Destinations</a><a href="packages.html">Packages</a><a href="search.html" class="active">Search</a><a href="blog.html">Blog</a><a href="about.html">About</a></nav>
+  <div class="navbar-actions"></div><!-- populated by auth.js -->
+</div></nav>
+
+<div class="search-hero"><div class="container">
+  <h1>Search destinations &amp; packages</h1>
+  <p>Find the perfect trip — filter by destination, date, budget, and more.</p>
+  <div class="search-bar">
+    <div class="sb-field"><span class="sb-icon">📍</span><div class="sb-inner"><label>Destination</label><input id="qDest" placeholder="Where to?" oninput="doSearch()"></div></div>
+    <div class="sb-field"><span class="sb-icon">📅</span><div class="sb-inner"><label>Check-in</label><input type="date" id="qDate"></div></div>
+    <div class="sb-field"><span class="sb-icon">👥</span><div class="sb-inner"><label>Guests</label><select id="qGuests"><option>2 Adults</option><option>1 Adult</option><option>2 Adults, 1 Child</option><option>2 Adults, 2 Children</option><option>Group (6+)</option></select></div></div>
+    <button class="sb-btn" onclick="doSearch()">Search</button>
+  </div>
+</div></div>
+
+<div class="container"><div class="search-layout">
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <!-- Category -->
+      <div class="filter-section">
+        <div class="filter-section-title">Category</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="checkbox" id="cb-all" checked> All</label>
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="checkbox" id="cb-beach"> Beach</label>
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="checkbox" id="cb-mountain"> Mountain</label>
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="checkbox" id="cb-city"> City</label>
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="checkbox" id="cb-nature"> Nature</label>
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="checkbox" id="cb-heritage"> Heritage</label>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <!-- Budget -->
+      <div class="filter-section">
+        <div class="filter-section-title">Budget (per person)</div>
+        <div class="price-range">
+          <span style="font-size:12px;white-space:nowrap">₹10k</span>
+          <input type="range" id="budgetRange" min="10000" max="200000" value="200000" step="5000">
+          <span style="font-size:12px;min-width:38px" id="budgetLabel">₹200k</span>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <!-- Duration -->
+      <div class="filter-section">
+        <div class="filter-section-title">Duration</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="radio" name="dur" value="any" checked> Any</label>
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="radio" name="dur" value="3-5"> 3–5 Days</label>
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="radio" name="dur" value="5-7"> 5–7 Days</label>
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="radio" name="dur" value="7plus"> 7+ Days</label>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <!-- Rating -->
+      <div class="filter-section">
+        <div class="filter-section-title">Rating</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="radio" name="rat" value="0" checked> Any rating</label>
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="radio" name="rat" value="4.5"> 4.5★ &amp; above</label>
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="radio" name="rat" value="4.0"> 4.0★ &amp; above</label>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <button class="btn btn-outline btn-full btn-sm" onclick="clearFilters()">Clear all filters</button>
+    </div>
+  </aside>
+
+  <div>
+    <div class="result-header">
+      <div class="result-count" id="rCount">Showing <strong>6</strong> results</div>
+      <div class="sort-row">
+        <label style="font-size:13px;color:var(--ts)">Sort:</label>
+        <select id="sortSelect" class="form-control" style="width:auto;padding:6px 12px" onchange="doSearch()">
+          <option value="recommended">Recommended</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating">Highest Rated</option>
+        </select>
+      </div>
+    </div>
+    <div class="result-grid" id="results"></div>
+  </div>
+</div></div>
+
+<footer class="footer"><div class="container">
+  <div class="footer-grid">
+    <div><div class="footer-brand">Voy<span>ara</span></div><p class="footer-desc">Crafting unforgettable journeys since 2010.</p></div>
+    <div class="footer-col"><h5>Explore</h5><ul><li><a href="destinations.html">Destinations</a></li><li><a href="packages.html">Packages</a></li></ul></div>
+    <div class="footer-col"><h5>Company</h5><ul><li><a href="about.html">About Us</a></li></ul></div>
+    <div class="footer-col"><h5>Support</h5><ul><li><a href="help-center.html">Help Centre</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><span>© 2025 Voyara Travel</span><span>Privacy · Terms</span></div>
+</div></footer>
+
+<script>
+// ── Dataset with numeric values for real filtering ────────────────────────
+const DATA = [
+  { id:1, cat:'Beach',   title:'Maldives Bliss Package',      dest:'Maldives',        desc:'Crystal lagoons, overwater villas, and coral reefs. The ultimate romantic escape.',     tags:['Honeymoon','Flights Incl.','5 Days'], price:85999,  days:5, rating:4.9, reviews:128, img:'https://images.unsplash.com/photo-1559628233-100c798642d4?w=400&q=80' },
+  { id:2, cat:'Heritage',title:'Royal Rajasthan Family Tour',  dest:'Rajasthan, India',desc:'Magnificent forts, golden deserts, and vibrant folk culture of the royal state.',      tags:['Family','Transport Incl.','8 Days'],  price:32499,  days:8, rating:4.7, reviews:94,  img:'https://www.bing.com/th/id/OIP.b4V2HUxuSzTaQMPpCL2cjgHaEK?w=274&h=211&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2' },
+  { id:3, cat:'Mountain', title:'Himalayan Adventure Rush',     dest:'Manali, India',   desc:'Paragliding, river rafting, trekking and snow sports in the mighty Himalayas.',        tags:['Adventure','Activities Incl.','6 Days'],price:18999, days:6, rating:4.5, reviews:67,  img:'manali.jpeg' },
+  { id:4, cat:'Nature',  title:'Swiss Alps Grand Tour',        dest:'Switzerland',     desc:'Five-star chalets, private skiing, scenic rail journeys, and fine mountain dining.',   tags:['Luxury','Flights Incl.','7 Days'],    price:124999, days:7, rating:4.9, reviews:43,  img:'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=400&q=80' },
+  { id:5, cat:'Beach',   title:'Bali Budget Explorer',         dest:'Bali, Indonesia', desc:'Temples, rice terraces, surf lessons and a cooking class — budget-friendly.',          tags:['Budget','Flights Incl.','5 Days'],    price:38499,  days:5, rating:4.4, reviews:211, img:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&q=80' },
+  { id:6, cat:'City',    title:'London Family Experience',     dest:'London, UK',      desc:'Harry Potter tour, Buckingham Palace, museums, and a West End show for the family.',   tags:['Family','Flights Incl.','7 Days'],    price:92999,  days:7, rating:4.8, reviews:76,  img:'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&q=80' },
+];
+
+// ── Render results list ───────────────────────────────────────────────────
+function render(list) {
+  const el = document.getElementById('results');
+  if (!list.length) {
+    el.innerHTML = `<div class="no-results"><p style="font-size:2rem;margin-bottom:12px">🔍</p><h3 style="margin-bottom:8px;font-size:1.2rem">No results found</h3><p>Try adjusting your filters or search term.</p></div>`;
+    document.getElementById('rCount').innerHTML = '<strong>0</strong> results';
+    return;
+  }
+  el.innerHTML = list.map(r => `
+    <div class="result-card">
+      <div class="rc-img"><img src="${r.img}" alt="${r.title}" loading="lazy"></div>
+      <div class="rc-body">
+        <div class="rc-cat">${r.cat} · ${r.dest}</div>
+        <div class="rc-title">${r.title}</div>
+        <div class="rc-desc">${r.desc}</div>
+        <div class="rc-tags">${r.tags.map(t => `<span class="rc-tag">${t}</span>`).join('')}</div>
+        <div class="rc-footer">
+          <div>
+            <div class="rc-price">₹${r.price.toLocaleString('en-IN')} <small>/person</small></div>
+            <div class="rc-rating"><span style="color:#f5a623">★</span> ${r.rating} <span>(${r.reviews} reviews)</span></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <a href="packages.html" class="btn btn-ghost btn-sm">Details</a>
+            <a href="booking.html" class="btn btn-primary btn-sm">Book Now</a>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+  document.getElementById('rCount').innerHTML = `Showing <strong>${list.length}</strong> result${list.length !== 1 ? 's' : ''}`;
+}
+
+// ── Master filter + sort function ─────────────────────────────────────────
+function doSearch() {
+  const q = (document.getElementById('qDest').value || '').toLowerCase().trim();
+
+  // 1. Category checkboxes
+  const cbAll      = document.getElementById('cb-all');
+  const catMap     = { beach: 'Beach', mountain: 'Mountain', city: 'City', nature: 'Nature', heritage: 'Heritage' };
+  const checkedCats = Object.entries(catMap)
+    .filter(([id]) => document.getElementById('cb-' + id).checked)
+    .map(([, label]) => label);
+  const allCats = cbAll.checked || checkedCats.length === 0;
+
+  // 2. Budget range
+  const maxBudget = parseInt(document.getElementById('budgetRange').value);
+
+  // 3. Duration radio (values: any / 3-5 / 5-7 / 7plus)
+  const durVal = document.querySelector('input[name=dur]:checked').value;
+
+  // 4. Rating radio (values: 0 / 4.5 / 4.0)
+  const minRating = parseFloat(document.querySelector('input[name=rat]:checked').value);
+
+  // 5. Sort
+  const sortVal = document.getElementById('sortSelect').value;
+
+  let filtered = DATA.filter(r => {
+    if (q && !r.title.toLowerCase().includes(q) && !r.dest.toLowerCase().includes(q) && !r.cat.toLowerCase().includes(q)) return false;
+    if (!allCats && !checkedCats.includes(r.cat)) return false;
+    if (r.price > maxBudget) return false;
+    if (durVal === '3-5'   && !(r.days >= 3 && r.days <= 5)) return false;
+    if (durVal === '5-7'   && !(r.days >= 5 && r.days <= 7)) return false;
+    if (durVal === '7plus' && r.days < 7)                     return false;
+    if (r.rating < minRating) return false;
+    return true;
+  });
+
+  // Sort
+  filtered.sort((a, b) => {
+    if (sortVal === 'price-asc')  return a.price - b.price;
+    if (sortVal === 'price-desc') return b.price - a.price;
+    if (sortVal === 'rating')     return b.rating - a.rating;
+    return 0;
+  });
+
+  render(filtered);
+}
+
+// ── Clear all filters ──────────────────────────────────────────────────────
+function clearFilters() {
+  document.getElementById('qDest').value = '';
+  ['cb-all','cb-beach','cb-mountain','cb-city','cb-nature','cb-heritage'].forEach((id, i) => {
+    document.getElementById(id).checked = (i === 0);
+  });
+  document.querySelectorAll('input[name=dur]')[0].checked = true;
+  document.querySelectorAll('input[name=rat]')[0].checked = true;
+  const range = document.getElementById('budgetRange');
+  range.value = range.max;
+  document.getElementById('budgetLabel').textContent = '₹' + parseInt(range.max / 1000) + 'k';
+  document.getElementById('sortSelect').selectedIndex = 0;
+  render(DATA);
+}
+
+// ── Wire up event listeners after DOM ready ────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Budget slider → live label + re-filter
+  document.getElementById('budgetRange').addEventListener('input', function() {
+    document.getElementById('budgetLabel').textContent = '₹' + parseInt(this.value / 1000) + 'k';
+    doSearch();
+  });
+
+  // Duration & rating radios
+  document.querySelectorAll('input[name=dur], input[name=rat]').forEach(r => r.addEventListener('change', doSearch));
+
+  // Category checkboxes — "All" mutual exclusion
+  const allCats = ['cb-all','cb-beach','cb-mountain','cb-city','cb-nature','cb-heritage'];
+  allCats.forEach((id, i) => {
+    document.getElementById(id).addEventListener('change', function() {
+      if (i === 0 && this.checked) {
+        allCats.slice(1).forEach(cid => document.getElementById(cid).checked = false);
+      } else if (i > 0 && this.checked) {
+        document.getElementById('cb-all').checked = false;
+      } else if (i > 0 && !this.checked) {
+        // If no specific cats remain checked, restore "All"
+        if (allCats.slice(1).every(cid => !document.getElementById(cid).checked)) {
+          document.getElementById('cb-all').checked = true;
+        }
+      }
+      doSearch();
+    });
+  });
+
+  // Set today as default date
+  document.getElementById('qDate').value = new Date().toISOString().split('T')[0];
+
+  // Initial render
+  render(DATA);
+});
+</script>
+</body></html>

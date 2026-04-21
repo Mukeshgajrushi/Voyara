@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking Confirmation — Voyara</title>
+<link rel="stylesheet" href="style.css">
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<style>
+.invoice-page { background: var(--gray-50); min-height: 100vh; }
+.invoice-topbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  padding: 16px 0;
+}
+.invoice-topbar-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.invoice-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 32px 72px;
+}
+.invoice-doc {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.invoice-header {
+  background: var(--black);
+  padding: 36px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.invoice-logo { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: #fff; }
+.invoice-logo span { color: var(--accent); }
+.invoice-meta { text-align: right; }
+.invoice-meta .inv-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+.invoice-meta .inv-val { font-size: 14px; color: rgba(255,255,255,0.85); }
+.invoice-meta .inv-ref { font-family: var(--font-display); font-size: 22px; color: var(--accent); font-weight: 700; }
+.confirm-banner {
+  background: var(--accent-light);
+  border-bottom: 1px solid #e8d5b0;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.confirm-icon {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--accent); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.confirm-text strong { display: block; font-size: 15px; color: var(--accent-dark); margin-bottom: 2px; }
+.confirm-text span { font-size: 13px; color: #9d7d42; }
+.invoice-body { padding: 36px 40px; }
+.inv-section { margin-bottom: 32px; }
+.inv-section-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--gray-400);
+  padding-bottom: 10px; border-bottom: 1px solid var(--gray-200);
+  margin-bottom: 16px;
+}
+.inv-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.inv-detail { }
+.inv-detail-label { font-size: 11px; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 3px; }
+.inv-detail-val { font-size: 14px; font-weight: 500; color: var(--black); }
+.package-block {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 20px;
+  align-items: start;
+  padding: 20px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+}
+.package-thumb { width: 120px; height: 90px; border-radius: var(--radius-md); object-fit: cover; background: var(--gray-200); }
+.timeline-simple { display: flex; flex-direction: column; gap: 0; }
+.tl-row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 0;
+  align-items: stretch;
+}
+.tl-date {
+  font-size: 12px; font-weight: 600; color: var(--gray-400);
+  padding: 12px 16px 12px 0;
+  text-align: right;
+  border-right: 2px solid var(--gray-200);
+  position: relative;
+}
+.tl-date::after {
+  content: '';
+  position: absolute;
+  right: -5px; top: 50%;
+  transform: translateY(-50%);
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.tl-desc {
+  font-size: 13px;
+  padding: 12px 0 12px 16px;
+  color: var(--gray-800);
+}
+.line-items { width: 100%; }
+.li-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--gray-100);
+  font-size: 14px;
+}
+.li-row:last-child { border-bottom: none; }
+.li-name { color: var(--gray-800); }
+.li-price { font-weight: 500; }
+.li-row.li-subtotal { color: var(--gray-400); font-size: 13px; }
+.li-row.li-discount .li-price { color: var(--success); }
+.li-row.li-total {
+  padding: 16px 20px;
+  background: var(--black);
+  border-radius: var(--radius-md);
+  margin-top: 8px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+.li-row.li-total .li-price { color: var(--accent); font-size: 18px; font-family: var(--font-display); }
+.addons-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.addon-badge {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--gray-50); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md); padding: 8px 12px;
+  font-size: 13px; color: var(--gray-800);
+}
+.invoice-footer {
+  background: var(--gray-50);
+  border-top: 1px solid var(--gray-200);
+  padding: 24px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--gray-400);
+}
+.qr-placeholder {
+  width: 72px; height: 72px;
+  background: var(--gray-200);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+}
+@media print {
+  .invoice-topbar, .invoice-actions { display: none !important; }
+  .invoice-wrap { padding: 0; }
+  .invoice-doc { box-shadow: none; border-radius: 0; border: none; }
+  body { background: white; }
+}
+</style>
+</head>
+<body class="invoice-page">
+
+<!-- Topbar -->
+<div class="invoice-topbar">
+  <div class="invoice-topbar-inner">
+    <a href="index.html" class="nav-logo" style="font-family:var(--font-display);font-size:20px;font-weight:700;text-decoration:none;color:var(--black);">Voy<span style="color:var(--accent);">ara</span></a>
+    <div class="flex gap-10 invoice-actions">
+      <button class="btn btn-outline btn-sm" onclick="window.print()">🖨 Print Invoice</button>
+      <button class="btn btn-outline btn-sm" onclick="alert('Invoice downloaded as PDF')">⬇ Download PDF</button>
+      <a href="my-trips.html" class="btn btn-primary btn-sm">View My Trips</a>
+    </div>
+  </div>
+</div>
+
+<div class="invoice-wrap">
+
+  <!-- Confirmation message above invoice -->
+  <div class="flex items-center gap-14 mb-24">
+    <div style="width:48px;height:48px;border-radius:50%;background:var(--success);display:flex;align-items:center;justify-content:center;font-size:22px;color:white;flex-shrink:0;">✓</div>
+    <div>
+      <h1 class="heading-2 mb-2">Booking Confirmed!</h1>
+      <p style="color:var(--gray-400);font-size:14px;">A confirmation email has been sent to <strong style="color:var(--black);">priya@email.com</strong></p>
+    </div>
+    <a href="packages.html" class="btn btn-outline btn-sm" style="margin-left:auto;">Book Another Trip</a>
+  </div>
+
+  <!-- Invoice Document -->
+  <div class="invoice-doc">
+
+    <!-- Header -->
+    <div class="invoice-header">
+      <div>
+        <div class="invoice-logo">Voy<span>ara</span></div>
+        <p style="color:rgba(255,255,255,0.45);font-size:12px;margin-top:4px;">Voyara Travel Pvt. Ltd.</p>
+        <p style="color:rgba(255,255,255,0.45);font-size:12px;">Pune, Maharashtra, India · GSTIN: 27AAACV1234A1Z5</p>
+      </div>
+      <div class="invoice-meta">
+        <div class="inv-label">Booking Reference</div>
+        <div class="inv-ref">#VYR-28441</div>
+        <div class="inv-label" style="margin-top:12px;">Invoice Date</div>
+        <div class="inv-val">15 March 2026</div>
+        <div class="inv-label" style="margin-top:8px;">Payment Status</div>
+        <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(39,174,96,0.15);border:1px solid rgba(39,174,96,0.3);border-radius:100px;padding:3px 10px;margin-top:3px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#27ae60;"></div>
+          <span style="color:#27ae60;font-size:12px;font-weight:600;">Paid</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmation Banner -->
+    <div class="confirm-banner">
+      <div class="confirm-icon">✓</div>
+      <div class="confirm-text">
+        <strong>Your trip is confirmed and fully paid</strong>
+        <span>Booking confirmed on 15 March 2026 · Free cancellation until 15 September 2026</span>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="invoice-body">
+
+      <!-- Billed To / From -->
+      <div class="inv-section">
+        <div class="inv-detail-grid">
+          <div>
+            <p class="inv-section-title">Billed To</p>
+            <div class="flex-col gap-6">
+              <div class="inv-detail"><div class="inv-detail-label">Name</div><div class="inv-detail-val">Priya Sharma</div></div>
+              <div class="inv-detail"><div class="inv-detail-label">Email</div><div class="inv-detail-val">priya@email.com</div></div>
+              <div class="inv-detail"><div class="inv-detail-label">Phone</div><div class="inv-detail-val">+91 98765 43210</div></div>
+              <div class="inv-detail"><div class="inv-detail-label">Passport</div><div class="inv-detail-val">P1234567</div></div>
+            </div>
+          </div>
+          <div>
+            <p class="inv-section-title">Contact Us</p>
+            <div class="flex-col gap-6">
+              <div class="inv-detail"><div class="inv-detail-label">Email</div><div class="inv-detail-val">hello@voyara.in</div></div>
+              <div class="inv-detail"><div class="inv-detail-label">Phone</div><div class="inv-detail-val">+91 800 123 4567</div></div>
+              <div class="inv-detail"><div class="inv-detail-label">Support</div><div class="inv-detail-val">Available 24/7</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Package Details -->
+      <div class="inv-section">
+        <p class="inv-section-title">Package Details</p>
+        <div class="package-block">
+          <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=300&q=80" class="package-thumb" alt="Santorini">
+          <div>
+            <h3 class="heading-3 mb-4">Santorini Sunset Escape</h3>
+            <p style="font-size:13px;color:var(--gray-400);margin-bottom:12px;">Greece · Europe</p>
+            <div class="inv-detail-grid" style="gap:12px;">
+              <div class="inv-detail"><div class="inv-detail-label">Check-in</div><div class="inv-detail-val">15 October 2025</div></div>
+              <div class="inv-detail"><div class="inv-detail-label">Check-out</div><div class="inv-detail-val">21 October 2025</div></div>
+              <div class="inv-detail"><div class="inv-detail-label">Duration</div><div class="inv-detail-val">6 nights / 7 days</div></div>
+              <div class="inv-detail"><div class="inv-detail-label">Guests</div><div class="inv-detail-val">2 adults</div></div>
+              <div class="inv-detail"><div class="inv-detail-label">Room</div><div class="inv-detail-val">Deluxe Caldera Room</div></div>
+              <div class="inv-detail"><div class="inv-detail-label">Meals</div><div class="inv-detail-val">All meals included</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add-ons -->
+      <div class="inv-section">
+        <p class="inv-section-title">Included Add-ons</p>
+        <div class="addons-row">
+          <div class="addon-badge">🚢 Sunset Cruise (+₹4,500)</div>
+          <div class="addon-badge">🍷 Wine Tasting Tour (+₹3,200)</div>
+          <div class="addon-badge">🚗 Airport Transfers (+₹6,000)</div>
+        </div>
+      </div>
+
+      <!-- Itinerary -->
+      <div class="inv-section">
+        <p class="inv-section-title">Trip Itinerary</p>
+        <div class="timeline-simple">
+          <div class="tl-row"><div class="tl-date">Oct 15</div><div class="tl-desc">Depart Mumbai (BOM → ATH) · 09:45 · Air India AI-150 · Arrive Athens 14:30 local · Transfer to Santorini by ferry</div></div>
+          <div class="tl-row"><div class="tl-date">Oct 15</div><div class="tl-desc">Check-in: Deluxe Caldera Room · Oia View Suites, Oia, Santorini</div></div>
+          <div class="tl-row"><div class="tl-date">Oct 16–17</div><div class="tl-desc">Free exploration — Fira, Imerovigli, Akrotiri ruins</div></div>
+          <div class="tl-row"><div class="tl-date">Oct 18</div><div class="tl-desc">Sunset Cruise — Private 2-hour caldera cruise (booked, 6:00 PM)</div></div>
+          <div class="tl-row"><div class="tl-date">Oct 19</div><div class="tl-desc">Wine Tasting Tour — Santo Wines, Venetsanos, Domaine Sigalas</div></div>
+          <div class="tl-row"><div class="tl-date">Oct 20</div><div class="tl-desc">Perissa Beach day · Leisure</div></div>
+          <div class="tl-row"><div class="tl-date">Oct 21</div><div class="tl-desc">Check-out 11:00 · Transfer to airport · Return flight ATH → BOM · AI-151 · Depart 16:00</div></div>
+        </div>
+      </div>
+
+      <!-- Price Breakdown -->
+      <div class="inv-section">
+        <p class="inv-section-title">Price Breakdown</p>
+        <div class="line-items">
+          <div class="li-row li-subtotal"><span class="li-name">2 adults × ₹1,24,000</span><span class="li-price">₹2,48,000</span></div>
+          <div class="li-row li-subtotal"><span class="li-name">Sunset Cruise</span><span class="li-price">₹4,500</span></div>
+          <div class="li-row li-subtotal"><span class="li-name">Wine Tasting Tour</span><span class="li-price">₹3,200</span></div>
+          <div class="li-row li-subtotal"><span class="li-name">Airport Transfers</span><span class="li-price">₹6,000</span></div>
+          <div class="li-row li-subtotal"><span class="li-name">Subtotal</span><span class="li-price">₹2,61,700</span></div>
+          <div class="li-row li-discount"><span class="li-name">Member Discount (–5%)</span><span class="li-price">–₹13,085</span></div>
+          <div class="li-row li-subtotal"><span class="li-name">GST (5%)</span><span class="li-price">₹12,431</span></div>
+          <div class="li-row li-total"><span class="li-name">Total Paid</span><span class="li-price">₹2,61,046</span></div>
+        </div>
+        <p style="font-size:12px;color:var(--gray-400);margin-top:12px;">Payment via Credit Card ending ****4242 · 15 March 2026 · Transaction ID: TXN8842901</p>
+      </div>
+
+      <!-- Important Info -->
+      <div class="inv-section">
+        <p class="inv-section-title">Important Information</p>
+        <div class="flex-col gap-8">
+          <div class="alert alert-info"><span>ℹ</span> Carry your original passport. Schengen visa required for Indian nationals.</div>
+          <div class="alert alert-warning"><span>⚠</span> Free cancellation until 15 September 2025. 50% refund between 15 Sep–Oct 1. No refund thereafter.</div>
+          <div class="alert alert-success"><span>✓</span> Travel insurance recommended. Add via your account at any time before departure.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="invoice-footer">
+      <div>
+        <p>Voyara Travel Pvt. Ltd. · CIN: U63090MH2018PTC123456 · GSTIN: 27AAACV1234A1Z5</p>
+        <p style="margin-top:3px;">Registered: Kalyani Nagar, Pune 411006 · IATA No: 14-3 2345 · hello@voyara.in</p>
+      </div>
+      <div class="qr-placeholder">⊞</div>
+    </div>
+
+  </div>
+
+  <!-- Action Buttons below invoice -->
+  <div class="flex gap-12 mt-24 invoice-actions" style="justify-content:center;">
+    <button class="btn btn-outline" onclick="window.print()">🖨 Print Invoice</button>
+    <button class="btn btn-outline" onclick="alert('Invoice emailed!')">📧 Email Invoice</button>
+    <a href="my-trips.html" class="btn btn-primary">View All My Trips →</a>
+  </div>
+
+</div>
+
+</body>
+</html>

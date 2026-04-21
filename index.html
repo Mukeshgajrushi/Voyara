@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voyara — Travel Agency</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="home.css">
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+
+</head>
+<body>
+
+<!-- Transparent nav over hero -->
+<nav class="navbar nav-transparent" id="mainNav">
+  <div class="container">
+    <a href="index.html" class="navbar-brand">Voy<span>ara</span></a>
+    <ul class="navbar-nav">
+      <li><a href="destinations.html">Destinations</a></li>
+      <li><a href="packages.html">Packages</a></li>
+      <li><a href="search.html">Explore</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+      <a href="booking.html" class="btn btn-primary btn-sm">Book Now</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">✦ Trusted by 120,000+ travellers</div>
+    <h1 class="display">Discover the world,<br><em>your way</em></h1>
+    <p class="hero-sub">Handcrafted journeys to the world's most extraordinary places. From ₹18,500 per person.</p>
+    <div class="hero-actions">
+      <a href="search.html" class="btn btn-primary btn-lg">Explore Destinations →</a>
+      <a href="packages.html" class="btn btn-outline btn-lg" style="color: #fff; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3);">Browse Packages</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat-item"><div class="hero-stat-num">2.4k+</div><div class="hero-stat-label">Destinations</div></div>
+      <div class="hero-stat-item"><div class="hero-stat-num">120k+</div><div class="hero-stat-label">Travellers</div></div>
+      <div class="hero-stat-item"><div class="hero-stat-num">4.9<span style="color:var(--gold)">★</span></div><div class="hero-stat-label">Avg Rating</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Search Bar -->
+<div class="search-wrapper">
+  <div class="container">
+    <div class="hero-search">
+      <div class="hs-field">
+        <label>Where to?</label>
+        <input type="text" placeholder="Destination, country…">
+      </div>
+      <div class="hs-field">
+        <label>Departure</label>
+        <input type="date" value="2025-10-01">
+      </div>
+      <div class="hs-field">
+        <label>Guests</label>
+        <select>
+          <option>2 Adults</option>
+          <option>1 Adult</option>
+          <option>3 Adults</option>
+          <option>2 Adults, 1 Child</option>
+          <option>Family (4+)</option>
+        </select>
+      </div>
+      <div style="padding: 4px;">
+        <button class="btn btn-primary btn-lg" style="height: 100%; width: 100%; justify-content: center; padding: 0 40px;">Search</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TRUST BAR ── -->
+<div class="trust-bar">
+  <div class="container">
+    <div class="trust-inner">
+      <div class="trust-item"><span>✦</span> <strong>Free cancellation</strong> up to 30 days</div>
+      <div class="trust-item"><span>✦</span> <strong>Best price</strong> guarantee</div>
+      <div class="trust-item"><span>✦</span> <strong>24/7 support</strong> on every trip</div>
+      <div class="trust-item"><span>✦</span> <strong>No hidden fees</strong> ever</div>
+      <div class="trust-item"><span>✦</span> <strong>Visa assistance</strong> included</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── POPULAR DESTINATIONS ── -->
+<section class="section">
+  <div class="container">
+    <div class="section-intro">
+      <div>
+        <p class="section-label">Explore the world</p>
+        <h2 class="text-gradient">Popular destinations</h2>
+      </div>
+      <a href="search.html" class="btn btn-outline">View all destinations →</a>
+    </div>
+
+    <div class="dest-grid">
+      <div class="dest-tile">
+        <img src="Santorini2.jpeg" alt="Santorini">
+        <div class="dest-tile-overlay">
+          <div class="dest-tile-info">
+            <h3>Santorini</h3>
+            <p>Greece · From ₹1,24,000</p>
+            <a href="destinations.html" class="explore-link">Explore →</a>
+          </div>
+        </div>
+      </div>
+      <div class="dest-tile">
+        <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=500&q=80" alt="Bali">
+        <div class="dest-tile-overlay">
+          <div class="dest-tile-info">
+            <h3>Bali</h3>
+            <p>Indonesia · From ₹68,000</p>
+            <a href="destinations.html" class="explore-link">Explore →</a>
+          </div>
+        </div>
+      </div>
+      <div class="dest-tile">
+        <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=500&q=80" alt="Japan">
+        <div class="dest-tile-overlay">
+          <div class="dest-tile-info">
+            <h3>Japan</h3>
+            <p>Asia · From ₹1,85,000</p>
+            <a href="destinations.html" class="explore-link">Explore →</a>
+          </div>
+        </div>
+      </div>
+      <div class="dest-tile">
+        <img src="https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=500&q=80" alt="Maldives">
+        <div class="dest-tile-overlay">
+          <div class="dest-tile-info">
+            <h3>Maldives</h3>
+            <p>Indian Ocean · From ₹2,85,000</p>
+            <a href="destinations.html" class="explore-link">Explore →</a>
+          </div>
+        </div>
+      </div>
+      <div class="dest-tile">
+        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=500&q=80" alt="Dubai">
+        <div class="dest-tile-overlay">
+          <div class="dest-tile-info">
+            <h3>Dubai</h3>
+            <p>UAE · From ₹72,000</p>
+            <a href="destinations.html" class="explore-link">Explore →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PACKAGES ── -->
+<section class="section" style="background: var(--off); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="container">
+    <div class="section-intro">
+      <div>
+        <p class="section-label">Curated for you</p>
+        <h2 class="text-gradient">Featured packages</h2>
+      </div>
+      <a href="packages.html" class="btn btn-outline">All packages →</a>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-img" style="position: relative;">
+          <span class="badge" style="position: absolute; top: 16px; left: 16px; z-index: 2; background: var(--ac); color: #fff;">Bestseller</span>
+          <img src="santorini2.jpeg" alt="Santorini">
+        </div>
+        <div class="card-body">
+          <p style="font-size: 11px; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Greece · 6 nights</p>
+          <h3 class="card-title">Santorini Sunset Escape</h3>
+          <p style="font-size: 14px; margin-bottom: 16px;">Clifftop villa, caldera views, sunset cruise & wine tasting.</p>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+            <span style="font-size: 12px; color: var(--muted);">4.9 (312)</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="card-price">₹1,24,000 <small>/ person</small></div>
+          <a href="booking.html" class="btn btn-primary btn-sm">Book</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img">
+          <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80" alt="Bali">
+        </div>
+        <div class="card-body">
+          <p style="font-size: 11px; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Indonesia · 5 nights</p>
+          <h3 class="card-title">Bali Temple & Jungle Trek</h3>
+          <p style="font-size: 14px; margin-bottom: 16px;">Ubud rice terraces, hidden temples & Mount Batur sunrise.</p>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+            <span style="font-size: 12px; color: var(--muted);">4.8 (198)</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="card-price">₹68,000 <small>/ person</small></div>
+          <a href="booking.html" class="btn btn-primary btn-sm">Book</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img" style="position: relative;">
+          <span class="badge badge-warn" style="position: absolute; top: 16px; left: 16px; z-index: 2;">Best Value</span>
+          <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="Goa">
+        </div>
+        <div class="card-body">
+          <p style="font-size: 11px; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">India · 4 nights</p>
+          <h3 class="card-title">Goa Beach Getaway</h3>
+          <p style="font-size: 14px; margin-bottom: 16px;">Sun, surf & seafood — the perfect quick escape from the city.</p>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span></div>
+            <span style="font-size: 12px; color: var(--muted);">4.3 (867)</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="card-price">₹18,500 <small>/ person</small></div>
+          <a href="booking.html" class="btn btn-primary btn-sm">Book</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHY VOYARA ── -->
+<section class="section why-section">
+  <div class="container">
+    <div class="text-center" style="margin-bottom: 64px;">
+      <p class="section-label">Our Philosophy</p>
+      <h2 class="display" style="font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 16px;">Everything you need,<br>nothing you don't</h2>
+      <p class="lead" style="max-width: 600px; margin: 0 auto;">We believe in quality over quantity, and experiences that linger in your memory long after you've returned home.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon">✦</div>
+        <h3 style="margin-bottom: 12px; font-size: 20px;">Handcrafted itineraries</h3>
+        <p style="color: var(--ts); font-size: 15px; line-height: 1.6;">Every trip is designed by humans who've been there — not generated by algorithms.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">💰</div>
+        <h3 style="margin-bottom: 12px; font-size: 20px;">Best price guarantee</h3>
+        <p style="color: var(--ts); font-size: 15px; line-height: 1.6;">Find it cheaper elsewhere? We'll match it — and give you a ₹2,000 travel credit.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">📞</div>
+        <h3 style="margin-bottom: 12px; font-size: 20px;">24/7 real support</h3>
+        <p style="color: var(--ts); font-size: 15px; line-height: 1.6;">A real human answers within minutes. Before, during, and after your trip.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">🛡</div>
+        <h3 style="margin-bottom: 12px; font-size: 20px;">Travel with confidence</h3>
+        <p style="color: var(--ts); font-size: 15px; line-height: 1.6;">Free cancellation up to 30 days. Comprehensive insurance options. Zero hidden fees.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section class="testimonial-section">
+  <div class="container">
+    <div class="text-center" style="margin-bottom: 64px;">
+      <p class="section-label" style="color: var(--gold);">Stories from travellers</p>
+      <h2 class="display" style="font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 16px; color: #fff;">120,000 happy journeys</h2>
+    </div>
+    <div class="grid-3" id="testimonial-grid">
+      <div class="testimonial-card">
+        <div class="stars" style="margin-bottom: 20px;"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="t-quote">"Our Santorini honeymoon was everything we dreamed of and more. Voyara handled every detail — we just showed up and fell in love with the place."</p>
+        <div class="t-author">
+          <div class="t-avatar">PS</div>
+          <div><div style="font-weight: 600; font-size: 15px;">Priya & Sanjay</div><div style="font-size: 12px; color: var(--muted);">Santorini · June 2025</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars" style="margin-bottom: 20px;"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="t-quote">"The Mount Batur sunrise trek was life-changing. Our guide Wayan was incredible. I've already referred four friends to Voyara."</p>
+        <div class="t-author">
+          <div class="t-avatar" style="background: var(--ac);">RK</div>
+          <div><div style="font-weight: 600; font-size: 15px;">Rohan Kumar</div><div style="font-size: 12px; color: var(--muted);">Bali Trek · April 2025</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars" style="margin-bottom: 20px;"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="t-quote">"Japan in cherry blossom season, perfectly timed, zero stress. Everything — Shinkansen, ryokan, Tokyo tours — was booked and confirmed before we landed."</p>
+        <div class="t-author">
+          <div class="t-avatar" style="background: var(--ach);">DM</div>
+          <div><div style="font-weight: 600; font-size: 15px;">Divya Menon</div><div style="font-size: 12px; color: var(--muted);">Japan · March 2025</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── BLOG PREVIEW ── -->
+<section class="section">
+  <div class="container">
+    <div class="section-intro">
+      <div>
+        <p class="label mb-8">Travel inspiration</p>
+        <h2 class="heading-1">From the Journal</h2>
+      </div>
+      <a href="blog.html" class="btn btn-outline">Read all stories →</a>
+    </div>
+    <div class="grid-3">
+      <div class="blog-preview-card">
+        <img src="https://images.unsplash.com/photo-1488085061387-422e29b40080?w=500&q=80" class="blog-preview-img" alt="Packing">
+        <div class="blog-preview-body">
+          <p class="blog-preview-tag">Packing Tips</p>
+          <h3 class="blog-preview-title">The Ultimate Carry-On List for 10 Days in Europe</h3>
+          <p style="font-size:12px;color:var(--gray-400);margin-top:8px;">Meera V. · 5 min read</p>
+        </div>
+      </div>
+      <div class="blog-preview-card">
+        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80" class="blog-preview-img" alt="Goa Budget">
+        <div class="blog-preview-body">
+          <p class="blog-preview-tag">Budget Travel</p>
+          <h3 class="blog-preview-title">How to Do Goa for Under ₹8,000 Per Day (All-In)</h3>
+          <p style="font-size:12px;color:var(--gray-400);margin-top:8px;">Rohan K. · 7 min read</p>
+        </div>
+      </div>
+      <div class="blog-preview-card">
+        <img src="https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=500&q=80" class="blog-preview-img" alt="Honeymoon">
+        <div class="blog-preview-body">
+          <p class="blog-preview-tag">Honeymoon</p>
+          <h3 class="blog-preview-title">Maldives vs Bali for Honeymoon: An Honest Comparison</h3>
+          <p style="font-size:12px;color:var(--gray-400);margin-top:8px;">Sneha M. · 6 min read</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="cta-section">
+  <div class="container">
+    <div class="glass-dark" style="max-width: 800px; margin: 0 auto; padding: 64px 48px; border-radius: var(--r);">
+      <p class="section-label" style="color: var(--gold); margin-bottom: 24px; justify-content: center;">Your next adventure awaits</p>
+      <h2 class="display" style="color: #fff; margin-bottom: 24px; font-size: clamp(2rem, 5vw, 3.5rem);">Ready to start your journey?</h2>
+      <p style="color: rgba(255,255,255,0.7); font-size: 18px; margin-bottom: 40px; max-width: 500px; margin-left: auto; margin-right: auto;">Join 120,000 travellers who trust Voyara with their most precious moments.</p>
+      <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+        <a href="packages.html" class="btn btn-primary btn-lg">Browse Packages →</a>
+        <a href="budget-calculator.html" class="btn btn-outline btn-lg" style="color: #fff; border-color: rgba(255,255,255,0.3);">Plan My Budget</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">Voy<span>ara</span></div>
+        <p class="footer-desc">Crafting unforgettable travel experiences since 2018. Your journey, our passion.</p>
+        <div style="display:flex;gap:12px;margin-top:20px;">
+          <a href="#" style="color:#555;font-size:18px;text-decoration:none;">𝕏</a>
+          <a href="#" style="color:#555;font-size:18px;text-decoration:none;">ⓘ</a>
+          <a href="#" style="color:#555;font-size:18px;text-decoration:none;">ⓕ</a>
+        </div>
+      </div>
+      <div><p class="footer-heading">Explore</p><ul class="footer-links"><li><a href="destinations.html">Destinations</a></li><li><a href="packages.html">Packages</a></li><li><a href="search.html">Search</a></li><li><a href="blog.html">Blog</a></li></ul></div>
+      <div><p class="footer-heading">Company</p><ul class="footer-links"><li><a href="about.html">About Us</a></li><li><a href="#">Careers</a></li><li><a href="#">Press</a></li><li><a href="#">Partners</a></li></ul></div>
+      <div><p class="footer-heading">Support</p><ul class="footer-links"><li><a href="help-center.html">Help Center</a></li><li><a href="contact.html">Contact Us</a></li><li><a href="#">Terms</a></li><li><a href="#">Privacy</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 Voyara Travel Pvt. Ltd. All rights reserved. IATA Accredited · ATOL Protected</p>
+      <div style="display:flex;gap:16px;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/200px-Mastercard-logo.svg.png" style="height:22px;opacity:0.4;filter:grayscale(1);" alt="Mastercard">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/200px-Visa_Inc._logo.svg.png" style="height:22px;opacity:0.4;filter:grayscale(1);" alt="Visa">
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Nav becomes opaque on scroll
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 80) {
+    nav.classList.remove('nav-transparent');
+    nav.style.position = 'sticky';
+  } else {
+    nav.classList.add('nav-transparent');
+    nav.style.position = 'absolute';
+  }
+});
+
+// Load dynamic reviews from localStorage
+function loadDynamicReviews() {
+  const reviews = JSON.parse(localStorage.getItem('user_reviews') || '[]');
+  const grid = document.getElementById('testimonial-grid');
+  if (!grid || !reviews.length) return;
+
+  reviews.forEach(r => {
+    const initials = (r.author || 'U').split(' ').map(n => n[0]).join('').toUpperCase();
+    const card = document.createElement('div');
+    card.className = 'testimonial-card';
+    card.innerHTML = `
+      <div class="t-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+      <p class="t-quote">"${r.body}"</p>
+      <div class="t-author">
+        <div style="width:40px;height:40px;border-radius:50%;background:#1a2a3a;display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--accent);font-size:14px;flex-shrink:0;">${initials}</div>
+        <div><div class="t-name">${r.author || 'Verified Traveller'}</div><div class="t-trip">${r.trip}</div></div>
+      </div>
+    `;
+    grid.prepend(card);
+  });
+}
+document.addEventListener('DOMContentLoaded', loadDynamicReviews);
+</script>
+</body>
+</html>

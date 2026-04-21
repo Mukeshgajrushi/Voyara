@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Voyara</title>
+<link rel="stylesheet" href="style.css">
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<style>
+.admin-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.admin-sidebar { background: var(--black, #1a1916); color: var(--white); padding: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.admin-logo { padding: 24px 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: var(--fd, Georgia); font-size: 22px; font-weight: 700; }
+.admin-logo span { color: var(--ac); }
+.admin-section-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.4); padding: 20px 24px 8px; }
+.admin-nav a { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s ease; }
+.admin-nav a:hover { color: white; background: rgba(255,255,255,0.05); }
+.admin-nav a.active { color: white; background: var(--ac); font-weight: 600; }
+.admin-main { background: var(--off); padding: 32px 40px; }
+.admin-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+.stat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 32px; }
+.admin-stat { background: var(--white); border: 1px solid var(--border); border-radius: var(--r); padding: 20px; box-shadow: var(--ssh); transition: transform 0.2s, box-shadow 0.2s; }
+.admin-stat:hover { transform: translateY(-3px); box-shadow: var(--sh); }
+.admin-stat-val { font-family: var(--fd, Georgia); font-size: 28px; font-weight: 400; line-height: 1; margin-bottom: 8px; color: var(--text); }
+.admin-stat-label { font-size: 11px; color: var(--ts); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.admin-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 24px; box-shadow: var(--ssh); }
+.admin-card-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.01); }
+.admin-card-body { padding: 20px 24px; }
+.status-badge { padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.s-confirmed { background: var(--acl); color: var(--ac); }
+.s-pending { background: var(--wb); color: var(--warn); }
+.s-cancelled { background: #fdf0ef; color: var(--danger); }
+.s-completed { background: var(--light); color: var(--ts); }
+.activity-item { display: flex; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--light); font-size: 14px; align-items: flex-start;}
+.act-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+.admin-section { display: none; animation: fadeIn 0.3s ease; }
+.admin-section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.pkg-row { display: flex; gap: 16px; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--light); }
+.pkg-thumb { width: 64px; height: 52px; border-radius: var(--rs); object-fit: cover; background: var(--light); flex-shrink: 0; }
+table { width: 100%; border-collapse: collapse; text-align: left; }
+th { padding: 14px 24px; font-size: 12px; font-weight: 600; color: var(--ts); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); background: var(--off); }
+td { padding: 16px 24px; border-bottom: 1px solid var(--light); font-size: 14px; color: var(--text); }
+tbody tr:hover { background: rgba(0,0,0,0.01); }
+
+/* CRUD MODAL Styles */
+.crud-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 9999; }
+.crud-modal.open { display: flex; }
+.crud-modal-content { background: var(--white); width: 100%; max-width: 500px; border-radius: var(--r); box-shadow: var(--sh); overflow: hidden; animation: modalIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
+@keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.crud-modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.crud-modal-body { padding: 24px; max-height: 70vh; overflow-y: auto; }
+.crud-modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); background: var(--off); display: flex; justify-content: flex-end; gap: 12px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+</style>
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="admin-logo">Voy<span>ara</span> <span style="font-size:11px;color:rgba(255,255,255,0.4);font-family:var(--fb);font-weight:400;letter-spacing:1px;text-transform:uppercase;">Admin</span></div>
+    <p class="admin-section-label">Main</p>
+    <nav class="admin-nav">
+      <a href="#" class="active" onclick="showAdminSection('dashboard', this)">📊 Dashboard</a>
+      <a href="#" onclick="showAdminSection('bookings', this)">📋 Bookings</a>
+      <a href="#" onclick="showAdminSection('packages', this)">📦 Packages</a>
+      <a href="#" onclick="showAdminSection('destinations', this)">📍 Destinations</a>
+      <a href="#" onclick="showAdminSection('users', this)">👥 Users</a>
+    </nav>
+    <p class="admin-section-label">Analytics</p>
+    <nav class="admin-nav">
+      <a href="#" onclick="showAdminSection('revenue', this)">💰 Revenue</a>
+      <a href="#" onclick="showAdminSection('reviews', this)">⭐ Reviews</a>
+    </nav>
+    <p class="admin-section-label">System</p>
+    <nav class="admin-nav">
+      <a href="#" onclick="showAdminSection('promos', this)">🎟 Promo Codes</a>
+      <a href="#" onclick="showAdminSection('settings', this)">⚙ Settings</a>
+      <a href="index.html" style="color:#666; margin-top:auto;">← Back to Site</a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div><h2 class="heading-2" id="section-title">Dashboard</h2><p style="font-size:13px;color:var(--ts);" id="current-date">Loading...</p></div>
+      <div class="flex gap-10 items-center">
+        <div class="avatar" style="background:var(--ac);color:var(--white);font-weight:700;">AD</div>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="admin-dashboard" class="admin-section active">
+      <div class="stat-grid">
+        <div class="admin-stat"><div class="admin-stat-val" id="stat-revenue">--</div><p class="admin-stat-label">Total Revenue</p></div>
+        <div class="admin-stat"><div class="admin-stat-val" id="stat-bookings">--</div><p class="admin-stat-label">Total Bookings</p></div>
+        <div class="admin-stat"><div class="admin-stat-val" id="stat-users">--</div><p class="admin-stat-label">Registered Users</p></div>
+        <div class="admin-stat"><div class="admin-stat-val" id="stat-packages">--</div><p class="admin-stat-label">Active Packages</p></div>
+        <div class="admin-stat"><div class="admin-stat-val" id="stat-destinations">--</div><p class="admin-stat-label">Destinations</p></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:24px;">
+        <div class="admin-card">
+          <div class="admin-card-header"><h3 class="heading-3">Recent Bookings</h3><a href="#" onclick="showAdminSection('bookings', document.querySelector('.admin-nav a:nth-child(2)'))" style="font-size:13px;color:var(--ac);font-weight:600;">View all →</a></div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr><th>Ref</th><th>Invoice #</th><th>Traveller</th><th>Package</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody id="recent-bookings-body"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-header"><h3 class="heading-3">Activity Feed</h3></div>
+          <div class="admin-card-body" style="padding:0; max-height:400px; overflow-y:auto;" id="activity-feed-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bookings -->
+    <div id="admin-bookings" class="admin-section">
+      <div class="admin-card">
+        <div class="admin-card-header"><h3 class="heading-3">All Bookings</h3></div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>Ref #</th><th>Invoice #</th><th>Traveller</th><th>Package</th><th>Dates</th><th>Guests</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="all-bookings-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Packages -->
+    <div id="admin-packages" class="admin-section">
+      <div class="flex justify-between items-center mb-20"><h2 class="heading-2">Packages</h2><button class="btn btn-primary" onclick="openCRUDModal('package')">+ Add Package</button></div>
+      <div class="admin-card"><div id="all-packages-body"></div></div>
+    </div>
+
+    <!-- Destinations -->
+    <div id="admin-destinations" class="admin-section">
+      <div class="flex justify-between items-center mb-20"><h2 class="heading-2">Destinations</h2><button class="btn btn-primary" onclick="openCRUDModal('destination')">+ Add Destination</button></div>
+      <div class="admin-card"><div id="all-destinations-body"></div></div>
+    </div>
+
+    <!-- Users -->
+    <div id="admin-users" class="admin-section">
+      <div class="flex justify-between items-center mb-20"><h2 class="heading-2">Registered Users</h2><button class="btn btn-primary" onclick="openCRUDModal('user')">+ Add User</button></div>
+      <div class="admin-card">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr></thead>
+          <tbody id="all-users-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Reviews -->
+    <div id="admin-reviews" class="admin-section">
+      <div class="flex justify-between items-center mb-20"><h2 class="heading-2">Reviews & Stories</h2><span class="badge" id="review-counter">Live</span></div>
+      <div class="admin-card"><div id="all-reviews-body"></div></div>
+    </div>
+
+    <!-- Placeholder Sections -->
+    <!-- Revenue Analytics -->
+    <div id="admin-revenue" class="admin-section">
+      <div class="stat-grid" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="admin-stat"><div class="admin-stat-val" id="rev-net">--</div><p class="admin-stat-label">Net Revenue</p></div>
+        <div class="admin-stat"><div class="admin-stat-val" id="rev-pending">--</div><p class="admin-stat-label">Pending Payments</p></div>
+        <div class="admin-stat"><div class="admin-stat-val" id="rev-captured">--</div><p class="admin-stat-label">Bookings Captured</p></div>
+        <div class="admin-stat"><div class="admin-stat-val" id="rev-aov">--</div><p class="admin-stat-label">Avg. Order Value</p></div>
+      </div>
+      
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px; margin-bottom:24px;">
+        <div class="admin-card">
+          <div class="admin-card-header"><h3 class="heading-3">Revenue by Category</h3></div>
+          <div class="admin-card-body" id="rev-category-breakdown"></div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-header"><h3 class="heading-3">Cancellation Impact</h3></div>
+          <div class="admin-card-body" id="rev-cancellation-impact"></div>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-header"><h3 class="heading-3">Revenue Ledger</h3></div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>Booking ID</th><th>Package</th><th>Date</th><th>Gross Amount</th><th>Status</th></tr></thead>
+            <tbody id="revenue-ledger-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div id="admin-promos" class="admin-section"><h2 class="heading-2">Promo Codes</h2><div class="admin-card" style="padding:40px;text-align:center;color:var(--ts)">Coming Soon in Beta</div></div>
+    <div id="admin-settings" class="admin-section"><h2 class="heading-2">Settings</h2><div class="admin-card" style="padding:40px;text-align:center;color:var(--ts)">Coming Soon in Beta</div></div>
+
+  </main>
+</div>
+
+<!-- ADD USER MODAL -->
+<div id="modal-user" class="crud-modal">
+  <div class="crud-modal-content">
+    <div class="crud-modal-header"><h3 class="heading-3">Add New User</h3><button class="btn btn-ghost" onclick="closeCRUDModal('user')">×</button></div>
+    <div class="crud-modal-body">
+      <form id="form-user" class="flex-col gap-16">
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">First Name</label><input type="text" name="firstName" class="form-control" required></div>
+          <div class="form-group"><label class="form-label">Last Name</label><input type="text" name="lastName" class="form-control" required></div>
+        </div>
+        <div class="form-group"><label class="form-label">Email Address</label><input type="email" name="email" class="form-control" required></div>
+        <div class="form-group"><label class="form-label">Password</label><input type="password" name="password" class="form-control" required></div>
+        <div class="form-group"><label class="form-label">Role</label><select name="role" class="form-control"><option value="user">User</option><option value="admin">Admin</option></select></div>
+      </form>
+    </div>
+    <div class="crud-modal-footer"><button class="btn btn-outline" onclick="closeCRUDModal('user')">Cancel</button><button class="btn btn-primary" onclick="handleFormSubmit('user')">Save User</button></div>
+  </div>
+</div>
+
+<!-- ADD PACKAGE MODAL -->
+<div id="modal-package" class="crud-modal">
+  <div class="crud-modal-content">
+    <div class="crud-modal-header"><h3 class="heading-3">Add New Package</h3><button class="btn btn-ghost" onclick="closeCRUDModal('package')">×</button></div>
+    <div class="crud-modal-body">
+      <form id="form-package" class="flex-col gap-16">
+        <div class="form-group"><label class="form-label">Package Title</label><input type="text" name="title" class="form-control" required></div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Location</label><input type="text" name="location" class="form-control" required></div>
+          <div class="form-group"><label class="form-label">Category</label><select name="category" class="form-control"><option value="family">Family</option><option value="honeymoon">Honeymoon</option><option value="adventure">Adventure</option><option value="luxury">Luxury</option><option value="budget">Budget</option></select></div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Price (₹)</label><input type="number" name="price" class="form-control" required></div>
+          <div class="form-group"><label class="form-label">Duration</label><input type="text" name="duration" class="form-control" placeholder="e.g. 5 Days / 4 Nights" required></div>
+        </div>
+        <div class="form-group"><label class="form-label">Image URL</label><input type="url" name="image" class="form-control" required></div>
+        <div class="form-group"><label class="form-label">Description</label><textarea name="desc" class="form-control" rows="3" required></textarea></div>
+      </form>
+    </div>
+    <div class="crud-modal-footer"><button class="btn btn-outline" onclick="closeCRUDModal('package')">Cancel</button><button class="btn btn-primary" onclick="handleFormSubmit('package')">Create Package</button></div>
+  </div>
+</div>
+
+<!-- ADD DESTINATION MODAL -->
+<div id="modal-destination" class="crud-modal">
+  <div class="crud-modal-content">
+    <div class="crud-modal-header"><h3 class="heading-3">Add Destination</h3><button class="btn btn-ghost" onclick="closeCRUDModal('destination')">×</button></div>
+    <div class="crud-modal-body">
+      <form id="form-destination" class="flex-col gap-16">
+        <div class="form-group"><label class="form-label">Destination Name</label><input type="text" name="title" class="form-control" required></div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Country</label><input type="text" name="country" class="form-control" required></div>
+          <div class="form-group"><label class="form-label">Type</label><select name="type" class="form-control"><option value="national">National</option><option value="international">International</option></select></div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Category</label><select name="category" class="form-control"><option value="beach">Beach</option><option value="mountain">Mountain</option><option value="city">City</option><option value="nature">Nature</option><option value="heritage">Heritage</option></select></div>
+          <div class="form-group"><label class="form-label">Best Season</label><input type="text" name="season" class="form-control" placeholder="e.g. Apr–Oct"></div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Budget</label><input type="text" name="budget" class="form-control" placeholder="e.g. ₹40,000+"></div>
+          <div class="form-group"><label class="form-label">Duration</label><input type="text" name="duration" class="form-control" placeholder="e.g. 5–7 Days"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Visa Info</label><input type="text" name="visa" class="form-control" placeholder="e.g. Visa on Arrival"></div>
+        <div class="form-group"><label class="form-label">Image URL</label><input type="url" name="image" class="form-control" required></div>
+        <div class="form-group"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3" required></textarea></div>
+        <div class="form-group"><label class="form-label">Pre-trip Checklist (one per line)</label><textarea name="checklist_raw" class="form-control" rows="4" placeholder="Valid passport&#10;Hotel reservation&#10;Travel insurance"></textarea></div>
+      </form>
+    </div>
+    <div class="crud-modal-footer"><button class="btn btn-outline" onclick="closeCRUDModal('destination')">Cancel</button><button class="btn btn-primary" onclick="handleFormSubmit('destination')">Save Destination</button></div>
+  </div>
+</div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>
